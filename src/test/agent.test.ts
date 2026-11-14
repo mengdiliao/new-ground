@@ -9,6 +9,20 @@ const searchResponse = () => Response.json({ results: [{ title: 'Library', url: 
 
 describe('OpenAI assistant safety and orchestration', () => {
   it('uses the requested configurable default model', () => { expect(DEFAULT_OPENAI_MODEL).toBe('gpt-6-luna'); });
+  it('keeps OpenAI context on a task follow-up and asks for missing essentials without searching', async () => {
+    let count = 0;
+    const fetcher = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body));
+      if (count++ > 0) expect(body.previous_response_id).toBe('clarification');
+      return Response.json({ id: 'clarification', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({ answer: 'Which city are you moving to?', plan: 'Confirm the destination before researching local services.', needsClarification: true }) }] }] });
+    }) as unknown as typeof fetch;
+    let result = await runAgentStep({ message: 'Help me move.' }, config, fetcher);
+    while (!result.done) result = await runAgentStep({ state: result.state }, config, fetcher);
+    expect(result.clarification).toBe(true); expect(result.rounds).toBe(0);
+    result = await runAgentStep({ state: result.state, message: 'Helsinki.' }, config, fetcher);
+    while (!result.done) result = await runAgentStep({ state: result.state }, config, fetcher);
+    expect(count).toBe(2);
+  });
   it('executes Exa tools and delivers an evidence-grounded answer', async () => {
     let models = 0;
     const fetcher = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
