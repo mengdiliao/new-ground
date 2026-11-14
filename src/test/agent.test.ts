@@ -19,7 +19,7 @@ describe('OpenAI assistant safety and orchestration', () => {
       expect(body.instructions).toContain('Verified destination time zone: Europe/Helsinki');
       return Response.json({ id: 'calendar', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({ answer: 'Choose the date.', plan: '', needsClarification: true, calendarAction: { ...emptyCalendar, title: 'Office visit' } }) }] }] });
     }) as unknown as typeof fetch;
-    const move = moveContext({ ...emptyProfile, id: 'move', status: 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), confirmedDetails: {}, destination: { cityId: 658225, cityName: 'Helsinki', countryCode: 'FI', countryName: 'Finland' } });
+    const move = moveContext({ ...emptyProfile, id: 'move', purpose: null, status: 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), confirmedDetails: {}, destination: { cityId: 658225, cityName: 'Helsinki', countryCode: 'FI', countryName: 'Finland' } });
     let result = await runAgentStep({ message: 'Add a registration office visit to my calendar.', move }, config, fetcher);
     while (!result.done) result = await runAgentStep({ state: result.state }, config, fetcher);
     expect(result.calendarAction?.startDate).toBe(''); expect(result.clarification).toBe(true); expect(result.rounds).toBe(0);
