@@ -4,6 +4,25 @@ import { GrowYourGround, plantStorageKey } from '@/components/grow-your-ground';
 
 afterEach(() => { cleanup(); localStorage.clear(); });
 
+it('resets fully grown plants to stage 0 and saves the reset across remounts', () => {
+  localStorage.setItem(plantStorageKey, '4');
+  const first = render(<GrowYourGround />);
+  fireEvent.click(screen.getByRole('button', { name: 'Reset plant growth' }));
+  expect(localStorage.getItem(plantStorageKey)).toBe('0');
+  expect(screen.queryByRole('button', { name: 'Reset plant growth' })).toBeNull();
+  first.unmount();
+  render(<GrowYourGround />);
+  expect(localStorage.getItem(plantStorageKey)).toBe('0');
+  fireEvent.click(screen.getByRole('button', { name: 'Water plant' }));
+  expect(localStorage.getItem(plantStorageKey)).toBe('1');
+});
+
+it.each([0, 1, 2, 3])('does not offer reset before full growth at stage %s', stage => {
+  localStorage.setItem(plantStorageKey, String(stage));
+  render(<GrowYourGround />);
+  expect(screen.queryByRole('button', { name: 'Reset plant growth' })).toBeNull();
+});
+
 it('starts at stage 0 and advances exactly one stage per manual watering up to 4', () => {
   render(<GrowYourGround />);
   expect(localStorage.getItem(plantStorageKey)).toBe('0');
