@@ -1,9 +1,9 @@
 export const taskStages = ['Planning', 'Researching', 'Reviewing', 'Completed'] as const;
 export type TaskStatus = typeof taskStages[number];
 export interface Message { id: string; role: 'user' | 'assistant'; text: string; }
-export interface Source { title: string; preview: string; url: string; }
+export interface Source { title: string; preview: string; url: string; domain?: string; highlights?: string[]; publishedDate?: string | null; }
 export interface Results { summary: string; options: string[]; steps: string[]; }
-export interface Task { id: string; title: string; description: string; status: TaskStatus; category: 'support' | 'compare' | 'process' | 'plan'; demo: boolean; messages: Message[]; draft: string; sources: Source[]; results?: Results | undefined; }
+export interface Task { id: string; title: string; description: string; status: TaskStatus; category: 'support' | 'compare' | 'process' | 'plan'; demo: boolean; messages: Message[]; draft: string; sources: Source[]; results?: Results | undefined; searchState?: 'idle' | 'loading' | 'success' | 'error'; searchError?: string | undefined; }
 const samples: Omit<Task, 'messages' | 'draft' | 'sources' | 'results'>[] = [
   { id: 'moving', title: 'A fresh start in a new city', description: 'Getting the essentials sorted for my upcoming move.', status: 'Planning', category: 'plan', demo: true },
   { id: 'insurance', title: 'Find the right health insurance', description: 'Comparing coverage, costs, and what matters to me.', status: 'Researching', category: 'compare', demo: true },
@@ -26,6 +26,7 @@ export function appendMessage(task: Task, text: string): Task {
   return { ...task, draft: '', messages: [...task.messages, { id: `${task.id}-${task.messages.length}`, role: 'user', text }, { id: `${task.id}-${task.messages.length + 1}`, role: 'assistant', text: 'I’ve added that context to this demo conversation. Keep your priorities, constraints, and timeline in mind as you review the example plan. No live research has been performed.' }] };
 }
 export function advanceDemo(task: Task): Task {
+  if (!task.demo) return task;
   if (!task.description || task.status === 'Completed') return task;
   const status = taskStages[taskStages.indexOf(task.status) + 1] ?? 'Completed';
   const sources: Source[] = [{ title: 'USA.gov — Government information', preview: 'An example starting point for public services and official requirements. Not searched or verified for your request.', url: 'https://www.usa.gov/' }, { title: 'Citizens Advice — Practical guidance', preview: 'An example resource for everyday questions in the UK. Relevance depends on your location.', url: 'https://www.citizensadvice.org.uk/' }];
