@@ -1,10 +1,17 @@
 import { createContext, useContext } from 'react';
-import type { Profile } from '@/lib/profile';
+import type { Profile, MoveProfile, MoveDetail } from '@/lib/profile';
 
 export interface ProfileContextValue {
   profile: Profile;
   saveProfile: (profile: Profile) => void;
   profileReady: boolean;
+  activeMove: MoveProfile | null;
+  moves: MoveProfile[];
+  storageError: string;
+  saveMove: (profile: Profile, id?: string, makeActive?: boolean) => void;
+  switchMove: (id: string | null) => void;
+  confirmDetail: (id: string, key: MoveDetail, value: string) => void;
+  completeMove: (id: string) => void;
 }
 
 // Separate from the refreshable provider so live component updates do not
