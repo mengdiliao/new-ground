@@ -6,7 +6,10 @@ import { sampleTasks, createLocalTask, createDraftTask, appendMessage, advanceDe
 import { TaskContext } from '@/lib/task-context';
 import { loadTasks, saveTasks } from '@/lib/task-storage';
 import { renameTask, toggleAction, answerActions } from '@/lib/task-history';
+import { useProfile } from '@/lib/profile-context';
+import { moveContext, moveRevision } from '@/lib/profile';
 export function NewGroundProvider({ children }: { children: ReactNode }) {
+  const { activeMove, moves } = useProfile();
   const [tasks, setTasks] = useState(sampleTasks);
   const [historyReady, setHistoryReady] = useState(false);
   const [storageError, setStorageError] = useState('');
@@ -27,9 +30,12 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
   const step = useServerFn(agentStep);
   const states = useRef(new Map<string, string>());
   const activeRequests = useRef(new Set<string>());
+  const taskMoves = useRef(new Map<string, Task>());
+  const bindMove = (task: Task): Task => ({ ...task, moveId: activeMove?.id ?? null, moveRevision: activeMove ? moveRevision(activeMove) : undefined, moveSnapshot: activeMove ? moveContext(activeMove) : null });
   const addTask = (text: string) => {
-    const task = createLocalTask(text, crypto.randomUUID());
-    if (task) setTasks(current => [task, ...current]);
+    const created = createLocalTask(text, crypto.randomUUID());
+    const task = created ? bindMove(created) : undefined;
+    if (task) { taskMoves.current.set(task.id, task); setTasks(current => [task, ...current]); }
     return task;
   };
   const updateTask = (id: string, update: (task: Task) => Task) => setTasks(current => current.map(task => { if (task.id !== id) return task; const next = update(task); return next === task ? task : { ...next, updatedAt: new Date().toISOString() }; }));
@@ -39,12 +45,15 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
     updateTask(id, task => ({ ...task, demo: false, status: 'Planning', agentStage: 'Understanding your request', searchState: 'loading', searchError: undefined, results: undefined }));
     try {
       let state = states.current.get(id);
-      const existing = tasksRef.current.find(task => task.id === id);
+      const existing = tasksRef.current.find(task => task.id === id) ?? taskMoves.current.get(id);
+      const move = moves.find(move => move.id === existing?.moveId);
+      const context = move ? moveContext(move) : existing?.moveSnapshot ?? null;
+      if (move && existing?.moveRevision !== moveRevision(move)) { state = undefined; states.current.delete(id); }
       const messages = existing?.messages ?? [];
       const prior = messages.at(-1)?.role === 'user' && messages.at(-1)?.text === query ? messages.slice(0, -1) : messages;
       const history = prior.slice(-20).map(message => ({ role: message.role, text: message.text.slice(0, 18000) }));
       for (let index = 0; index <= MAX_AGENT_STEPS + 1; index++) {
-        const result = await step({ data: index === 0 ? { state, message: query, ...(!state ? { history } : {}) } : { state } });
+        const result = await step({ data: index === 0 ? { state, message: query, move: context, ...(!state ? { history } : {}) } : { state } });
         if (result.state) { state = result.state; states.current.set(id, state); }
         updateTask(id, task => ({ ...task, agentState: state, agentStage: result.stage ?? task.agentStage, researchPlan: result.plan ?? task.researchPlan, sources: result.sources, searchRounds: result.rounds,
           status: result.done ? result.clarification || result.error ? 'Planning' : 'Reviewing' : result.stage === 'Understanding your request' ? 'Planning' : result.stage === 'Preparing your answer' || result.stage === 'Comparing findings' ? 'Reviewing' : 'Researching',
@@ -57,5 +66,6 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
     } catch { updateTask(id, task => ({ ...task, searchState: 'error', searchError: 'The assistant could not connect. Your conversation and sources are preserved. Please retry.' })); }
     finally { activeRequests.current.delete(id); }
   };
-  return <TaskContext.Provider value={{ tasks, addTask, researchTask, historyReady, storageError, renameTask: (id, title) => updateTask(id, task => renameTask(task, title)), deleteTask: id => { states.current.delete(id); setTasks(current => current.filter(task => task.id !== id)); }, setTaskCompleted: (id, completed) => updateTask(id, task => ({ ...task, status: completed ? 'Completed' : task.results ? 'Reviewing' : 'Planning' })), toggleAction: (id, action) => updateTask(id, task => toggleAction(task, action)), newTask: () => { const task = createDraftTask(crypto.randomUUID()); setTasks(current => [task, ...current]); return task; }, updateDraft: (id, draft) => updateTask(id, task => ({ ...task, draft })), sendMessage: (id, text) => updateTask(id, task => appendMessage(task, text)), advanceTask: id => updateTask(id, advanceDemo), showSuggestions, setShowSuggestions }}>{children}</TaskContext.Provider>;
+  const visibleTasks = tasks.filter(task => task.demo || (task.moveId ?? null) === (activeMove?.id ?? null));
+  return <TaskContext.Provider value={{ tasks: visibleTasks, allTasks: tasks, addTask, researchTask, historyReady, storageError, renameTask: (id, title) => updateTask(id, task => renameTask(task, title)), deleteTask: id => { states.current.delete(id); taskMoves.current.delete(id); setTasks(current => current.filter(task => task.id !== id)); }, setTaskCompleted: (id, completed) => updateTask(id, task => ({ ...task, status: completed ? 'Completed' : task.results ? 'Reviewing' : 'Planning' })), toggleAction: (id, action) => updateTask(id, task => toggleAction(task, action)), newTask: () => { const task = bindMove(createDraftTask(crypto.randomUUID())); taskMoves.current.set(task.id, task); setTasks(current => [task, ...current]); return task; }, updateDraft: (id, draft) => updateTask(id, task => ({ ...task, draft })), sendMessage: (id, text) => updateTask(id, task => appendMessage(task, text)), advanceTask: id => updateTask(id, advanceDemo), showSuggestions, setShowSuggestions }}>{children}</TaskContext.Provider>;
 }

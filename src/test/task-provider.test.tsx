@@ -4,6 +4,7 @@ vi.mock('@tanstack/react-start', () => ({ useServerFn: () => vi.fn() }));
 vi.mock('@/lib/agent.functions', () => ({ agentStep: vi.fn() }));
 import { NewGroundProvider } from '@/components/new-ground-provider';
 import { useNewGround } from '@/lib/task-context';
+import { ProfileProvider } from '@/components/profile-provider';
 
 afterEach(() => { cleanup(); window.localStorage.clear(); });
 
@@ -13,10 +14,10 @@ function Consumer() {
 }
 
 it('keeps consumers connected to task state when the provider rerenders', () => {
-  const view = render(<NewGroundProvider><Consumer /></NewGroundProvider>);
+  const view = render(<ProfileProvider><NewGroundProvider><Consumer /></NewGroundProvider></ProfileProvider>);
   expect(screen.getByLabelText('Task count')).toHaveTextContent('3');
   fireEvent.click(screen.getByText('Add task'));
   expect(screen.getByLabelText('Task count')).toHaveTextContent('4');
-  view.rerender(<NewGroundProvider><Consumer /></NewGroundProvider>);
+  view.rerender(<ProfileProvider><NewGroundProvider><Consumer /></NewGroundProvider></ProfileProvider>);
   expect(screen.getByLabelText('Task count')).toHaveTextContent('4');
 });

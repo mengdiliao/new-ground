@@ -3,6 +3,7 @@ import type { Task } from '@/lib/task-data';
 
 export interface TaskContextValue {
   tasks: Task[];
+  allTasks: Task[];
   addTask: (text: string) => Task | undefined;
   newTask: () => Task;
   updateDraft: (id: string, text: string) => void;

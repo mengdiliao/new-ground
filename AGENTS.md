@@ -39,3 +39,6 @@ use the editor.
 - Define shared React contexts and consumer hooks separately from refreshable provider components so live updates preserve provider-consumer identity.
 - Run explicit OpenAI Responses requests through bounded server-function steps using the existing Exa service; encrypted continuation state preserves context and enforces per-task search budgets without exposing internal tool payloads.
 - Keep every profile value explicitly null until the user sets it; locations are saved only from validated GeoNames suggestions picked in the LocationPicker, never from free text, and dashboard copy must render empty states instead of example values.
+- Store multiple moves in the existing versioned device-local profile adapter, migrating legacy profiles in place; explicit save and activation prevent setup from triggering research.
+- Mount the profile provider above task state; bind each task to its move and immutable research-context snapshot so switching never mixes histories, and changed research can be refreshed separately.
+- Validate minimal move context at the agent boundary and seal it into continuation state; only confirmed details personalize requests, with unknown identity never inferred from origin.
