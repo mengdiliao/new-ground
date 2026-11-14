@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { NewGroundProvider } from '@/components/new-ground-provider';
+import { ProfileProvider } from '@/components/profile-provider';
 import { AppShell } from '@/components/app-shell';
 
 function NotFoundComponent() {
@@ -126,7 +127,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <NewGroundProvider><AppShell><Outlet /></AppShell></NewGroundProvider>
+      <NewGroundProvider><ProfileProvider><AppShell><Outlet /></AppShell></ProfileProvider></NewGroundProvider>
     </QueryClientProvider>
   );
 }
