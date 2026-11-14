@@ -4,7 +4,7 @@ export type ResearchImage = z.infer<typeof researchImageSchema>;
 export function safeImageUrl(value: string) {
   try { const url = new URL(value); const host = url.hostname.toLowerCase(); if (url.protocol !== 'https:' || url.username || url.password || url.port || !host.includes('.') || host === 'localhost' || /(^|\.)(local|internal|localhost)$/.test(host) || /^[\d.]+$/.test(host) || host.includes(':')) return null; return url.href; } catch { return null; }
 }
-export function imageCandidates(result: { url: string; title?: string | null; image?: string | null; extras?: { imageLinks?: string[] | null; richImageLinks?: { url: string; alt?: string | undefined }[] | null } | null }): ResearchImage[] {
+export function imageCandidates(result: { url: string; title?: string | null | undefined; image?: string | null | undefined; extras?: { imageLinks?: string[] | null | undefined; richImageLinks?: { url: string; alt?: string | undefined }[] | null | undefined } | null | undefined }): ResearchImage[] {
   const seen = new Set<string>();
   return [...(result.extras?.richImageLinks ?? []).map(image => ({ ...image, kind: 'content' as const })), ...(result.image ? [{ url: result.image, alt: '', kind: 'page' as const }] : [])].flatMap(image => {
     const url = safeImageUrl(image.url); const alt = image.alt?.trim() ?? '';
