@@ -23,5 +23,5 @@ export function loadTasks(storage: TaskStorage): Task[] {
   return parsed.tasks.flatMap(value => { const result = savedTask.safeParse(migrateConversation(value)); if (!result.success) return []; const task = result.data; return [{ ...task, ...(task.searchState === 'loading' ? { searchState: 'error' as const, searchError: 'This research was interrupted. Retry your request to continue.' } : {}) }]; });
 }
 export function saveTasks(storage: TaskStorage, tasks: Task[]) {
-  storage.setItem(TASK_STORAGE_KEY, JSON.stringify({ version: 2, tasks: tasks.filter(task => !task.demo).map(task => savedTask.parse({ ...task, draft: '' })) }));
+  storage.setItem(TASK_STORAGE_KEY, JSON.stringify({ version: 2, tasks: tasks.filter(task => !task.demo).map(task => savedTask.parse({ ...task, messages: task.messages.filter(message => !message.emailDraft), draft: '' })) }));
 }

@@ -48,3 +48,5 @@ use the editor.
 - Share history filtering and cards across home and history pages so category separation and move scoping stay consistent.
 - Cache City Essentials independently by move, category and relevant context after hydration; persist errors without automatic retries, reject unsupported citations and contact numbers, and create conversations only through explicit item actions.
 - Retrieve images only through existing Exa searches; cache bounded raster bytes locally without browser hotlinks, strip bytes from agent continuation/model payloads, and retain original source attribution with optional relevance-selected galleries.
+
+- Keep email actions as typed session-only conversation cards using the existing agent; validate recipient evidence and handoff URLs, preserve manual edits in revisions, and never mutate task status or claim sending.
