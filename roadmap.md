@@ -1,4 +1,8 @@
 # New Ground frontend
+## Calendar Assistant
+- [ ] Add typed calendar drafts to the existing AI with current-date context, reliable destination time zones, and task isolation.
+- [ ] Add editable cards and reusable calendar actions for chats, research, and city items, with Google links and calendar files.
+- [ ] Verify missing dates, tentative status, daylight saving, calendar export, live chats, and phone layout.
 ## Email Assistant
 - [x] Add structured, evidence-checked email actions to the existing assistant without task progress changes.
 - [x] Add session-only editing, rewriting, translation, copy, and user-initiated mail handoffs.
