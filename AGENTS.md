@@ -53,3 +53,4 @@ use the editor.
 
 - Keep calendar drafts session-only and separate from task progress; resolve destination zones from GeoNames coordinates, use Temporal for DST-safe UTC exports, and provide reusable prepare-only actions with explicit external handoffs.
 - Attach at most one optional, recent-history-deduplicated suggestion to each answer; clicks reuse existing draft handlers and tracked-task conversion requires explicit confirmation.
+- Isolate the sidebar plant in its own component and browser storage key; hydrate before saving and advance only through its watering handler to avoid coupling with assistant activity.
