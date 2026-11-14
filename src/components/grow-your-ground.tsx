@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Droplet } from 'lucide-react';
+import { Droplet, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export const plantStorageKey = 'new-ground:plant-stage';
@@ -56,8 +56,8 @@ export function GrowYourGround() {
         <path d="M113 27 Q105 38 113 38 Q121 38 113 27 Z" />
       </g>}
     </svg>
-    <div className="flex h-8 items-center justify-center" aria-live="polite">
-      {stage < 4 ? <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" aria-label="Water plant" title="Water plant" disabled={!ready} onClick={water}><Droplet aria-hidden="true" /></Button> : <span className="font-plant-message text-sm font-semibold text-sage-foreground">Rooting for you! 🌱</span>}
+    <div className="flex h-8 items-center justify-center gap-1" aria-live="polite">
+      {stage < 4 ? <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" aria-label="Water plant" title="Water plant" disabled={!ready} onClick={water}><Droplet aria-hidden="true" /></Button> : <><span className="font-plant-message text-sm font-semibold text-sage-foreground">Rooting for you! 🌱</span><Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 rounded-full text-muted-foreground" aria-label="Reset plant growth" title="Reset plant growth" onClick={() => { setStage(0); setWatering(0); }}><RotateCcw aria-hidden="true" /></Button></>}
     </div>
     {storageError && <p role="status" className="mt-2 text-xs text-muted-foreground">Growth can’t be saved on this device.</p>}
   </section>;
