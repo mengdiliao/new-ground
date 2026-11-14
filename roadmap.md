@@ -1,4 +1,8 @@
 # New Ground frontend
+## Queries and tracked tasks
+- [ ] Migrate saved history safely and distinguish queries from explicit tasks.
+- [ ] Add shared history tabs, creation choice, conversion, manual status, and local notes.
+- [ ] Verify migration, move isolation, live research, persistence, and card layout.
 ## Persistent Move Setup
 - [x] Reuse device-local profile storage for multiple moves, migration, editing, switching, and confirmed details.
 - [x] Replace the homepage form with saved-move summary and shared setup controls.

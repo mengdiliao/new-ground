@@ -2,22 +2,22 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { agentStep } from '@/lib/agent.functions';
 import { MAX_AGENT_STEPS } from '@/lib/agent';
-import { sampleTasks, createLocalTask, createDraftTask, appendMessage, advanceDemo, type Task } from '@/lib/task-data';
+import { createLocalTask, createDraftTask, appendMessage, advanceDemo, type Task, type ConversationType } from '@/lib/task-data';
 import { TaskContext } from '@/lib/task-context';
 import { loadTasks, saveTasks } from '@/lib/task-storage';
-import { renameTask, toggleAction, answerActions } from '@/lib/task-history';
+import { renameTask, toggleAction, answerActions, convertToTask, changeTaskStatus, updateTaskNotes } from '@/lib/task-history';
 import { useProfile } from '@/lib/profile-context';
 import { moveContext, moveRevision } from '@/lib/profile';
 export function NewGroundProvider({ children }: { children: ReactNode }) {
   const { activeMove, moves } = useProfile();
-  const [tasks, setTasks] = useState(sampleTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [historyReady, setHistoryReady] = useState(false);
   const [storageError, setStorageError] = useState('');
   const storageWritable = useRef(true);
   const tasksRef = useRef(tasks);
   tasksRef.current = tasks;
   useEffect(() => {
-    try { const saved = loadTasks(window.localStorage); setTasks([...saved.sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '')), ...sampleTasks]); }
+    try { const saved = loadTasks(window.localStorage); setTasks(saved.sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? ''))); }
     catch { storageWritable.current = false; setStorageError('Saved history could not be read. Existing browser data has not been overwritten; changes will last only for this visit.'); }
     setHistoryReady(true);
   }, []);
@@ -32,8 +32,8 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
   const activeRequests = useRef(new Set<string>());
   const taskMoves = useRef(new Map<string, Task>());
   const bindMove = (task: Task): Task => ({ ...task, moveId: activeMove?.id ?? null, moveRevision: activeMove ? moveRevision(activeMove) : undefined, moveSnapshot: activeMove ? moveContext(activeMove) : null });
-  const addTask = (text: string) => {
-    const created = createLocalTask(text, crypto.randomUUID());
+  const addTask = (text: string, type: ConversationType = 'query') => {
+    const created = createLocalTask(text, crypto.randomUUID(), type);
     const task = created ? bindMove(created) : undefined;
     if (task) { taskMoves.current.set(task.id, task); setTasks(current => [task, ...current]); }
     return task;
@@ -42,7 +42,7 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
   const researchTask = async (id: string, query: string) => {
     if (activeRequests.current.has(id)) return;
     activeRequests.current.add(id);
-    updateTask(id, task => ({ ...task, demo: false, status: 'Planning', agentStage: 'Understanding your request', searchState: 'loading', searchError: undefined, results: undefined }));
+    updateTask(id, task => ({ ...task, demo: false, agentStage: 'Understanding your request', searchState: 'loading', searchError: undefined, results: undefined }));
     try {
       let state = states.current.get(id);
       const existing = tasksRef.current.find(task => task.id === id) ?? taskMoves.current.get(id);
@@ -55,7 +55,6 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
         const result = await step({ data: index === 0 ? { state, message: query, move: context, ...(!state ? { history } : {}) } : { state } });
         if (result.state) { state = result.state; states.current.set(id, state); }
         updateTask(id, task => ({ ...task, agentState: state, agentStage: result.stage ?? task.agentStage, researchPlan: result.plan ?? task.researchPlan, sources: result.sources, searchRounds: result.rounds,
-          status: result.done ? result.clarification || result.error ? 'Planning' : 'Reviewing' : result.stage === 'Understanding your request' ? 'Planning' : result.stage === 'Preparing your answer' || result.stage === 'Comparing findings' ? 'Reviewing' : 'Researching',
           searchState: result.done ? result.error ? 'error' : 'success' : 'loading', searchError: result.error,
           ...(result.answer ? { messages: [...task.messages, { id: crypto.randomUUID(), role: 'assistant' as const, text: result.answer }], results: result.clarification ? undefined : { summary: result.answer, options: [], steps: answerActions(result.answer) } } : {}) }));
         if (result.done) return;
@@ -65,6 +64,6 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
     } catch { updateTask(id, task => ({ ...task, searchState: 'error', searchError: 'The assistant could not connect. Your conversation and sources are preserved. Please retry.' })); }
     finally { activeRequests.current.delete(id); }
   };
-  const visibleTasks = tasks.filter(task => task.demo || (task.moveId ?? null) === (activeMove?.id ?? null));
-  return <TaskContext.Provider value={{ tasks: visibleTasks, allTasks: tasks, addTask, researchTask, historyReady, storageError, renameTask: (id, title) => updateTask(id, task => renameTask(task, title)), deleteTask: id => { states.current.delete(id); taskMoves.current.delete(id); setTasks(current => current.filter(task => task.id !== id)); }, setTaskCompleted: (id, completed) => updateTask(id, task => ({ ...task, status: completed ? 'Completed' : task.results ? 'Reviewing' : 'Planning' })), toggleAction: (id, action) => updateTask(id, task => toggleAction(task, action)), newTask: () => { const task = bindMove(createDraftTask(crypto.randomUUID())); taskMoves.current.set(task.id, task); setTasks(current => [task, ...current]); return task; }, updateDraft: (id, draft) => updateTask(id, task => ({ ...task, draft })), sendMessage: (id, text) => updateTask(id, task => appendMessage(task, text)), advanceTask: id => updateTask(id, advanceDemo), showSuggestions, setShowSuggestions }}>{children}</TaskContext.Provider>;
+  const visibleTasks = tasks.filter(task => !task.demo && (task.moveId ?? null) === (activeMove?.id ?? null));
+  return <TaskContext.Provider value={{ tasks: visibleTasks, allTasks: tasks, addTask, researchTask, historyReady, storageError, renameTask: (id, title) => updateTask(id, task => renameTask(task, title)), deleteTask: id => { states.current.delete(id); taskMoves.current.delete(id); setTasks(current => current.filter(task => task.id !== id)); }, setTaskStatus: (id, status) => updateTask(id, task => changeTaskStatus(task, status)), convertQuery: id => updateTask(id, convertToTask), updateNotes: (id, notes) => updateTask(id, task => updateTaskNotes(task, notes)), toggleAction: (id, action) => updateTask(id, task => toggleAction(task, action)), newTask: (type = 'task') => { const task = bindMove(createDraftTask(crypto.randomUUID(), type)); taskMoves.current.set(task.id, task); setTasks(current => [task, ...current]); return task; }, updateDraft: (id, draft) => updateTask(id, task => ({ ...task, draft })), sendMessage: (id, text) => updateTask(id, task => appendMessage(task, text)), advanceTask: id => updateTask(id, advanceDemo), showSuggestions, setShowSuggestions }}>{children}</TaskContext.Provider>;
 }
