@@ -256,7 +256,7 @@ svg { stroke-linecap: round; stroke-linejoin: round; }
 @keyframes tile-turn { from { opacity: 0.3; transform: rotateX(-75deg); } to { opacity: 1; transform: rotateX(0); } }
 @media (max-width: 1199px) { .change-welcome h1 { font-size: 52px; max-width: 630px; } .change-world { width: 185px; height: 150px; top: 8px; right: 0; } }
 @media (max-width: 950px) { .change-world { display: none; } .topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .change-welcome h1 { font-size: 46px; } }
-@media (max-width: 767px) { .change-welcome h1 { font-size: 40px; margin-top: 25px; } .change-intro { font-size: 16px; } .change-letters { width: 276px; } .change-tile { font-size: 18px; height: 32px; } .change-board { gap: 8px; padding: 10px; } .change-composer textarea { flex-basis: 100%; } .change-composer > button { width: 100%; } .topic-heading { font-size: 36px; } .topic-card { padding: 18px; } }
+@media (max-width: 767px) { .change-welcome h1 { font-size: 40px; margin-top: 25px; } .change-intro { font-size: 16px; } .change-letters { width: 276px; } .change-tile { font-size: 18px; height: 32px; } .change-board { gap: 8px; padding: 10px; } .change-composer textarea { flex-basis: 100%; min-height: 70px; height: 70px; } .change-composer > button { width: 100%; } .topic-heading { font-size: 36px; } .topic-card { padding: 18px; } }
 @media (max-width: 480px) { .topic-grid { grid-template-columns: 1fr; } .change-welcome h1 { font-size: 38px; } .change-letters { width: 252px; } }
 @keyframes soft-enter { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
 @media (min-width: 1500px) { .page-content { padding-top: 54px; } .welcome { min-height: 305px; } .world-image { height: 305px; } }
