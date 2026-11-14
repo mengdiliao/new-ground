@@ -7,6 +7,7 @@ import { MAX_AGENT_STEPS } from '@/lib/agent';
 import { useProfile } from '@/lib/profile-context';
 import { moveContext, type MoveProfile } from '@/lib/profile';
 import type { Source } from '@/lib/task-data';
+import { compactSourceImages } from '@/lib/research-images';
 
 export function CityEssentialsProvider({ children }: { children: ReactNode }) {
   const { activeMove, profileReady } = useProfile();
@@ -35,7 +36,7 @@ export function CityEssentialsProvider({ children }: { children: ReactNode }) {
       for (let i = 0; i <= MAX_AGENT_STEPS + 1; i++) {
         const result = await step({ data: { category, moveId: move.id, destinationId: move.destination.cityId, request: i === 0 ? { message: 'Research City Essentials', move: moveContext(move) } : { state } } });
         state = result.state;
-        for (const source of result.sources ?? []) if (source.images?.some(image => image.dataUrl)) imageSources.set(source.url, source);
+        for (const source of await compactSourceImages(result.sources ?? [])) if (source.images?.some(image => image.dataUrl)) imageSources.set(source.url, source);
         if (result.done) { put({ ...module, status: result.error ? 'error' : 'success', items: result.items.map(item => ({ ...item, sourceReferences: item.sourceReferences.map(source => ({ ...source, images: imageSources.get(source.url)?.images ?? source.images })) })), researchedAt: result.error ? undefined : new Date().toISOString(), error: result.error }); return; }
         if (!state) break;
       }

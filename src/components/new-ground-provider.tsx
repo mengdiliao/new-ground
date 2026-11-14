@@ -8,7 +8,7 @@ import { loadTasks, saveTasks } from '@/lib/task-storage';
 import { renameTask, toggleAction, answerActions, convertToTask, changeTaskStatus, updateTaskNotes } from '@/lib/task-history';
 import { useProfile } from '@/lib/profile-context';
 import { moveContext, moveRevision } from '@/lib/profile';
-import { selectedImages } from '@/lib/research-images';
+import { selectedImages, compactSourceImages } from '@/lib/research-images';
 export function NewGroundProvider({ children }: { children: ReactNode }) {
   const { activeMove, moves } = useProfile();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -56,7 +56,7 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
       for (let index = 0; index <= MAX_AGENT_STEPS + 1; index++) {
         const result = await step({ data: index === 0 ? { state, message: query, move: context, ...(!state ? { history } : {}) } : { state } });
         if (result.state) { state = result.state; states.current.set(id, state); }
-        for (const source of result.sources) if (source.images?.some(image => image.dataUrl)) imageSources.set(source.url, source);
+        for (const source of await compactSourceImages(result.sources)) if (source.images?.some(image => image.dataUrl)) imageSources.set(source.url, source);
         const enrichedSources = result.sources.map(source => imageSources.get(source.url) ?? source);
         updateTask(id, task => ({ ...task, agentState: state, agentStage: result.stage ?? task.agentStage, researchPlan: result.plan ?? task.researchPlan, sources: enrichedSources.length ? enrichedSources : task.sources, searchRounds: result.rounds,
           searchState: result.done ? result.error ? 'error' : 'success' : 'loading', searchError: result.error,

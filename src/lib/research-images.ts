@@ -16,3 +16,17 @@ export function imageCandidates(result: { url: string; title?: string | null | u
 export function selectedImages(sources: { images?: ResearchImage[] | undefined }[], refs: number[] = sources.map((_, i) => i + 1)) {
   const seen = new Set<string>(); return refs.flatMap(number => sources[number - 1]?.images ?? []).filter(image => { if (!image.dataUrl || seen.has(image.url)) return false; seen.add(image.url); return true; }).slice(0, 3);
 }
+export async function compactSourceImages<T extends { images?: ResearchImage[] | undefined }>(sources: T[]): Promise<T[]> {
+  return Promise.all(sources.map(async source => ({ ...source, images: source.images ? (await Promise.all(source.images.map(async image => {
+    if (!image.dataUrl) return image;
+    try {
+      const bitmap = await createImageBitmap(await (await fetch(image.dataUrl)).blob());
+      if (bitmap.width < 240 || bitmap.height < 140) { bitmap.close(); return null; }
+      const canvas = document.createElement('canvas'); const scale = Math.min(1, 800 / bitmap.width);
+      canvas.width = Math.round(bitmap.width * scale); canvas.height = Math.round(bitmap.height * scale);
+      const context = canvas.getContext('2d'); if (!context) { bitmap.close(); return null; }
+      context.drawImage(bitmap, 0, 0, canvas.width, canvas.height); bitmap.close();
+      return { ...image, dataUrl: canvas.toDataURL('image/jpeg', 0.7) };
+    } catch { return null; }
+  }))).filter((image): image is ResearchImage => Boolean(image)) : undefined })));
+}
