@@ -9,7 +9,11 @@ const samples: Omit<Task, 'messages' | 'draft' | 'sources' | 'results'>[] = [
   { id: 'insurance', title: 'Find the right health insurance', description: 'Comparing coverage, costs, and what matters to me.', status: 'Researching', category: 'compare', demo: true },
   { id: 'garden', title: 'Start a little balcony garden', description: 'A simple plan to bring a little green into my everyday.', status: 'Completed', category: 'support', demo: true },
 ];
-export const sampleTasks: Task[] = samples.map(task => ({ ...task, draft: '', sources: [], messages: [{ id: `${task.id}-request`, role: 'user', text: task.description }, { id: `${task.id}-intro`, role: 'assistant', text: 'This is a sample workspace. What would a good outcome look like for you?' }] }));
+export const sampleTasks: Task[] = samples.map(task => {
+  let workspace: Task = { ...task, status: 'Planning', draft: '', sources: [], messages: [{ id: `${task.id}-request`, role: 'user', text: task.description }, { id: `${task.id}-intro`, role: 'assistant', text: 'This is a sample workspace. What would a good outcome look like for you?' }] };
+  while (workspace.status !== task.status) workspace = advanceDemo(workspace);
+  return workspace;
+});
 export function createDraftTask(id: string): Task { return { id, title: 'Untitled task', description: '', status: 'Planning', category: 'plan', demo: false, messages: [], draft: '', sources: [] }; }
 export function createLocalTask(text: string, id: string): Task | undefined {
   const description = text.trim();

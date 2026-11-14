@@ -9,6 +9,6 @@
 - [x] Verify the existing interactions and desktop/mobile presentation.
 
 ## Interactive task workflow
-- [ ] Add dedicated task workspaces and per-task conversation, progress, research, and result state.
-- [ ] Connect submission, keyboard controls, new tasks, and task switching.
-- [ ] Test demo honesty, state isolation, and desktop/mobile flows.
+- [x] Add dedicated task workspaces and per-task conversation, progress, research, and result state.
+- [x] Connect submission, keyboard controls, new tasks, and task switching.
+- [x] Test demo honesty, state isolation, and desktop/mobile flows.
