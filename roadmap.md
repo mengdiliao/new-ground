@@ -4,6 +4,6 @@
 - [x] Verify desktop and mobile interactions.
 
 ## Visual refinement
-- [ ] Apply the specified palette, typography, corners, and soft shadows without changing behavior.
-- [ ] Refine the neighborhood illustration and illustrated empty state.
-- [ ] Verify the existing interactions and desktop/mobile presentation.
+- [x] Apply the specified palette, typography, corners, and soft shadows without changing behavior.
+- [x] Refine the neighborhood illustration and illustrated empty state.
+- [x] Verify the existing interactions and desktop/mobile presentation.

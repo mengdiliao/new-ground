@@ -100,7 +100,7 @@
   --card-foreground: var(--foreground);
   --popover: var(--card);
   --popover-foreground: var(--foreground);
-  --primary: var(--brand-blue);
+  --primary: oklch(0.45 0.075 251.5532);
   --primary-foreground: oklch(0.19 0.03 248);
   --secondary: color-mix(in oklab, var(--brand-mint) 24%, var(--background));
   --secondary-foreground: var(--foreground);

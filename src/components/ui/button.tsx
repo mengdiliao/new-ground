@@ -12,7 +12,7 @@ const buttonVariants = cva(
         nav: "control-nav justify-start text-muted-foreground hover:bg-accent hover:text-foreground data-[active=true]:bg-accent",
         suggestion: "control-card h-auto items-start justify-start whitespace-normal border border-border bg-card text-card-foreground hover:border-primary/40",
         task: "control-card h-auto items-start justify-start whitespace-normal border border-border bg-card text-card-foreground hover:border-primary/40",
-        default: "control-primary bg-primary text-primary-foreground hover:bg-primary/90",
+        default: "control-primary bg-brand-blue text-primary-foreground hover:bg-brand-blue/90",
         destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
           "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
