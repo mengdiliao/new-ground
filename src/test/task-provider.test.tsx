@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, cleanup } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
-const { request } = vi.hoisted(() => ({ request: vi.fn(async () => ({ done: true, sources: [], rounds: 0 })) }));
+const { request } = vi.hoisted(() => ({ request: vi.fn(async (_input: unknown) => ({ done: true, sources: [], rounds: 0 })) }));
 vi.mock('@tanstack/react-start', () => ({ useServerFn: () => request }));
 vi.mock('@/lib/agent.functions', () => ({ agentStep: vi.fn() }));
 import { NewGroundProvider } from '@/components/new-ground-provider';
