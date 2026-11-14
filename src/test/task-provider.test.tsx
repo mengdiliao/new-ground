@@ -64,3 +64,12 @@ it('preserves earlier research sources when a follow-up needs no new search', as
   await act(async () => { fireEvent.click(screen.getByText('Run research')); });
   expect(loadTasks(window.localStorage)[0]).toMatchObject({ sources, notes: 'My note', status: 'Waiting' });
 });
+
+it('preserves City Essentials references on explicitly created tasks', () => {
+  const sources = [{ title: 'Original authority', url: 'https://112.fi/en', preview: 'Emergency services' }];
+  function AddEssential() { const { addTask } = useNewGround(); return <button onClick={() => addTask('Save emergency contacts', 'task', sources)}>Confirm essential</button>; }
+  render(<ProfileProvider><NewGroundProvider><AddEssential /></NewGroundProvider></ProfileProvider>);
+  fireEvent.click(screen.getByText('Confirm essential'));
+  expect(loadTasks(window.localStorage)[0]).toMatchObject({ type: 'task', status: 'Not Started', sources });
+  expect(request).not.toHaveBeenCalled();
+});

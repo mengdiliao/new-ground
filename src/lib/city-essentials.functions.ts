@@ -4,7 +4,7 @@ import { agentInput, DEFAULT_OPENAI_MODEL } from './agent';
 import { categories, normalizeItems, researchItemsSchema } from './city-essentials';
 import { runAgentStep } from './agent.server';
 
-const inputSchema = z.object({ request: agentInput, category: z.enum(categories), moveId: z.string().min(1).max(100), destinationId: z.number().int() });
+const inputSchema = z.object({ request: agentInput, category: z.enum(categories), moveId: z.string().min(1).max(100), destinationId: z.number().int() }).refine(data => !data.request.message || Boolean(data.request.move?.destination), 'A confirmed destination is required.');
 export const essentialsStep = createServerFn({ method: 'POST' }).inputValidator(input => inputSchema.parse(input)).handler(async ({ data }) => {
   const openaiKey = process.env['OPENAI_API_KEY'];
   const exaKey = process.env['EXA_API_KEY'];
