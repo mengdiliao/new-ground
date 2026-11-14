@@ -1,9 +1,9 @@
 # New Ground frontend
 ## Feature discovery
-- [ ] Replace the homepage category grid with a four-card feature discovery section (illustrated, two-column grid).
-- [ ] Move "Your Move" directly below the hero as a compact journey card with inline pickers and swap.
-- [ ] Add dedicated feature workspaces with contextual destination collection and the shared composer.
-- [ ] Verify routing, live research from a feature page, tests, and desktop/mobile layout.
+- [x] Replace the homepage category grid with a four-card feature discovery section (illustrated, two-column grid).
+- [x] Move "Your Move" directly below the hero as a compact journey card with inline pickers and swap.
+- [x] Add dedicated feature workspaces with contextual destination collection and the shared composer.
+- [x] Verify routing, live research from a feature page, tests, and desktop/mobile layout.
 
 ## Claude-inspired presentation
 - [x] Review the task-history brief and add browser-only persistence, rename/delete/reopen controls, timestamps, and action checkboxes.
