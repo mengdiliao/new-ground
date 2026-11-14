@@ -15,10 +15,10 @@ import { emptyCalendar } from '@/lib/calendar-draft';
 
 afterEach(() => { cleanup(); window.localStorage.clear(); request.mockClear(); });
 
-it('keeps calendar actions in the existing task while preserving email, notes, results and manual status', async () => {
+it('keeps calendar actions in the existing task while preserving notes, results and manual status', async () => {
   const task = { ...createDraftTask('calendar-task', 'task'), status: 'Waiting' as const, notes: 'Private note', results: { summary: 'Earlier findings', options: [], steps: ['Call office'] }, completedActions: ['Call office'] };
   saveTasks(window.localStorage, [task]);
-  function CalendarConsumer() { const { tasks, researchTask, editCalendar, cancelCalendar, editEmail } = useNewGround(); const current = tasks[0]; const draft = current?.messages.find(message => message.calendarDraft)?.calendarDraft; return <><output aria-label="Calendar task state">{JSON.stringify(current)}</output><button onClick={() => { if (current) void researchTask(current.id, 'Prepare a calendar reminder'); }}>Prepare calendar</button><button onClick={() => { if (current && draft) editCalendar(current.id, { ...draft, title: 'Edited calendar title', startDate: '2026-11-17' }); }}>Edit calendar</button><button onClick={() => { if (current && draft) cancelCalendar(current.id, draft.id); }}>Cancel calendar</button></>; }
+  function CalendarConsumer() { const { tasks, researchTask, editCalendar, cancelCalendar } = useNewGround(); const current = tasks[0]; const draft = current?.messages.find(message => message.calendarDraft)?.calendarDraft; return <><output aria-label="Calendar task state">{JSON.stringify(current)}</output><button onClick={() => { if (current) void researchTask(current.id, 'Prepare a calendar reminder'); }}>Prepare calendar</button><button onClick={() => { if (current && draft) editCalendar(current.id, { ...draft, title: 'Edited calendar title', startDate: '2026-11-17' }); }}>Edit calendar</button><button onClick={() => { if (current && draft) cancelCalendar(current.id, draft.id); }}>Cancel calendar</button></>; }
   request.mockResolvedValueOnce({ done: true, sources: [], rounds: 0, calendarAction: { ...emptyCalendar, title: 'Visit office' } });
   render(<ProfileProvider><NewGroundProvider><CalendarConsumer /></NewGroundProvider></ProfileProvider>);
   await act(async () => { fireEvent.click(screen.getByText('Prepare calendar')); });
