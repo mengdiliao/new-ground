@@ -9,6 +9,12 @@ export interface TaskContextValue {
   sendMessage: (id: string, text: string) => void;
   advanceTask: (id: string) => void;
   researchTask: (id: string, query: string) => Promise<void>;
+  renameTask: (id: string, title: string) => void;
+  deleteTask: (id: string) => void;
+  setTaskCompleted: (id: string, completed: boolean) => void;
+  toggleAction: (id: string, action: string) => void;
+  historyReady: boolean;
+  storageError: string;
   showSuggestions: boolean;
   setShowSuggestions: (value: boolean) => void;
 }

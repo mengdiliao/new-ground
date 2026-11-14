@@ -1,4 +1,11 @@
 # New Ground frontend
+## Claude-inspired presentation
+- [x] Review the task-history brief and add browser-only persistence, rename/delete/reopen controls, timestamps, and action checkboxes.
+- [x] Verify saved conversations, restored live replies, checklist persistence, and confirmed deletion; all 50 tests pass.
+- [x] Refresh homepage typography and add a reduced-motion-aware rotating word board.
+- [x] Add nine dedicated topic pages with suggested questions using the unchanged research workflow.
+- [x] Verify topic navigation, live answers, existing tests, and desktop/mobile layout.
+
 - [x] Establish the warm visual system and illustrated homepage.
 - [x] Add sidebar navigation, demo task views, and local task creation.
 - [x] Verify desktop and mobile interactions.

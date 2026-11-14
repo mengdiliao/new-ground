@@ -30,8 +30,10 @@ use the editor.
 <!-- LOVABLE:END -->
 
 ## Application architecture
-- Keep shared navigation and session-only task state in a root-mounted application provider and shell; leaf routes own their page content and metadata.
-- Keep task state session-only; live web searches use the Exa server function and must never fall back to demo sources or generated conclusions on failure.
+- Keep shared navigation and task state in a root-mounted application provider and shell; leaf routes own their page content and metadata.
+- Define topic questions in a shared typed catalog and submit home/topic requests through the same composer and existing task provider, so presentation changes never fork research behavior.
+- Persist non-demo tasks through an isolated, schema-validated browser storage adapter after hydration; exclude drafts and internal continuation tokens, restore conversations as bounded history, and keep sample tasks explicitly separate.
+- Live web searches use the Exa server function and must never fall back to demo sources or generated conclusions on failure.
 - Keep credentials inside server-function handlers and normalize search responses in pure typed helpers; browser components receive only safe results and user-facing errors.
 - Store each workspace's conversation, draft, stage, sources, and results on its task record; pure workflow helpers and prop-driven panels keep future data integration independent of presentation.
 - Define shared React contexts and consumer hooks separately from refreshable provider components so live updates preserve provider-consumer identity.

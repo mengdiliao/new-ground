@@ -8,6 +8,14 @@ const answerResponse = () => Response.json({ id: 'answer', output: [{ type: 'mes
 const searchResponse = () => Response.json({ results: [{ title: 'Library', url: 'https://example.org/library', highlights: ['Opening hours vary by day.'] }] });
 
 describe('OpenAI assistant safety and orchestration', () => {
+  it('restores saved conversation context without a persisted continuation token', async () => {
+    const fetcher = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)); expect(body.input).toEqual([{ role: 'user', content: 'Help me move.' }, { role: 'assistant', content: 'Which city?' }, { role: 'user', content: 'Helsinki.' }]); return answerResponse();
+    }) as unknown as typeof fetch;
+    let result = await runAgentStep({ message: 'Helsinki.', history: [{ role: 'user', text: 'Help me move.' }, { role: 'assistant', text: 'Which city?' }] }, config, fetcher);
+    while (!result.done) result = await runAgentStep({ state: result.state }, config, fetcher);
+    expect(fetcher).toHaveBeenCalledOnce(); expect(result.answer).toBeDefined();
+  });
   it('uses the requested configurable default model', () => { expect(DEFAULT_OPENAI_MODEL).toBe('gpt-6-luna'); });
   it('keeps OpenAI context on a task follow-up and asks for missing essentials without searching', async () => {
     let count = 0;
