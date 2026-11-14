@@ -15,7 +15,7 @@ import { emptyCalendar } from '@/lib/calendar-draft';
 afterEach(() => { cleanup(); localStorage.clear(); request.mockReset(); });
 function Consumer() {
   const { tasks, researchTask } = useNewGround(); const task = tasks[0];
-  return <><output aria-label="Tracked count">{tasks.filter(task => task.type === 'task').length}</output><output aria-label="Conversation count">{tasks.length}</output><ButtonForResponse run={() => { if (task) void researchTask(task.id, 'What should I do?'); }} />{task?.messages.map(message => message.suggestedAction ? <ActionSuggestion key={message.id} task={task} message={message} /> : message.emailDraft ? <output aria-label="Opened email">{message.emailDraft.subject}</output> : message.calendarDraft ? <output aria-label="Opened calendar">{message.calendarDraft.title}</output> : null)}</>;
+  return <><output aria-label="Tracked count">{tasks.filter(task => task.type === 'task').length}</output><output aria-label="Conversation count">{tasks.length}</output><ButtonForResponse run={() => { if (task) void researchTask(task.id, 'What should I do?'); }} />{task?.messages.map(message => message.suggestedAction ? <ActionSuggestion key={message.id} task={task} message={message} /> : message.emailDraft ? <output key={message.id} aria-label="Opened email">{message.emailDraft.subject}</output> : message.calendarDraft ? <output key={message.id} aria-label="Opened calendar">{message.calendarDraft.title}</output> : null)}</>;
 }
 function ButtonForResponse({ run }: { run: () => void }) { return <button onClick={run}>Ask assistant</button>; }
 function mount() { saveTasks(localStorage, [createDraftTask('query')]); render(<ProfileProvider><NewGroundProvider><Consumer /></NewGroundProvider></ProfileProvider>); }
