@@ -31,3 +31,9 @@
 - [x] Preserve per-task conversations, evidence, and research limits across follow-ups.
 - [x] Connect answers, clarification, retry, and sources without changing the visual system.
 - [x] Test safety limits and a complete live request (33 tests; official Oodi sources, contextual follow-up, desktop and mobile).
+
+## Onboarding and profile
+- [x] Build a flight-booking-style LocationPicker (search + country browsing) on the global GeoNames dataset.
+- [x] Add an onboarding flow and profile model where every value stays unknown until the user sets it.
+- [x] Add a profile-driven dashboard card with empty states and destination-gated move research.
+- [x] Verify onboarding, swap, empty states, persistence, and existing chat end to end (67 tests; live answer with sources).
