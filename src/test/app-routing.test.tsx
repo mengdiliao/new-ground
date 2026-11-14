@@ -12,7 +12,7 @@ describe("App routing", () => {
     const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
     const matches = router.matchRoutes(`/topics/${topic.slug}`);
     expect(matches.at(-1)?.routeId).toBe('/topics/$topicId');
-    expect(matches.at(-1)?.params.topicId).toBe(topic.slug);
+    expect(matches.at(-1)?.params).toMatchObject({ topicId: topic.slug });
   });
   it('matches the dedicated workspace without mounting the task-list page', () => {
     const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
