@@ -4,7 +4,7 @@ import { Plus, Search } from 'lucide-react';
 import neighborhood from '@/assets/neighborhood-refined.png';
 import { Button } from '@/components/ui/button';
 import { TaskCard } from '@/components/task-card';
-import { useNewGround } from '@/components/new-ground-provider';
+import { useNewGround } from '@/lib/task-context';
 export const Route = createFileRoute('/tasks')({ head: () => ({ meta: [{ title: 'My Tasks — New Ground' }, { name: 'description', content: 'Keep your everyday plans and next steps in one thoughtful place.' }, { property: 'og:title', content: 'My Tasks — New Ground' }, { property: 'og:description', content: 'A little progress, every day. Your plans and next steps.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] }), component: Tasks });
 function Tasks() {
   const { tasks, newTask } = useNewGround(); const navigate = useNavigate(); const [filter, setFilter] = useState('All tasks'); const [query, setQuery] = useState('');

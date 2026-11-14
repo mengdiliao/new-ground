@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ArrowRight, Send, Sprout, Check, Circle, ExternalLink, BookOpen, ListChecks, LoaderCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { taskStages, type Task, type Source, type Results } from '@/lib/task-data';
-import { useNewGround } from '@/components/new-ground-provider';
+import { useNewGround } from '@/lib/task-context';
 import neighborhood from '@/assets/neighborhood-refined.png';
 
 export function ProgressPanel({ status }: { status: Task['status'] }) {

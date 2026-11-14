@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 import { ArrowRight, Sparkles, HeartHandshake, Scale, Files, Map, LockKeyhole, Sprout } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNewGround } from '@/components/new-ground-provider';
+import { useNewGround } from '@/lib/task-context';
 import { TaskCard, categoryStyles } from '@/components/task-card';
 import neighborhood from '@/assets/neighborhood-refined.png';
 

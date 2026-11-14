@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Link, useRouterState, useNavigate } from '@tanstack/react-router';
 import { Sprout, Plus, House, Layers, Settings, PanelLeftClose, PanelLeftOpen, Leaf, X, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNewGround } from '@/components/new-ground-provider';
+import { useNewGround } from '@/lib/task-context';
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: state => state.location.pathname });
   const navigate = useNavigate();

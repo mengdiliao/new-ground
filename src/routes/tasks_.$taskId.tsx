@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useNewGround } from '@/components/new-ground-provider';
+import { useNewGround } from '@/lib/task-context';
 import { TaskWorkspace } from '@/components/task-workspace';
 import { Button } from '@/components/ui/button';
 import neighborhood from '@/assets/neighborhood-refined.png';
