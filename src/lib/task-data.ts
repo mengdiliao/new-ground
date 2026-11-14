@@ -3,7 +3,7 @@ export type TaskStatus = typeof taskStages[number];
 export interface Message { id: string; role: 'user' | 'assistant'; text: string; }
 export interface Source { title: string; preview: string; url: string; }
 export interface Results { summary: string; options: string[]; steps: string[]; }
-export interface Task { id: string; title: string; description: string; status: TaskStatus; category: 'support' | 'compare' | 'process' | 'plan'; demo: boolean; messages: Message[]; draft: string; sources: Source[]; results?: Results; }
+export interface Task { id: string; title: string; description: string; status: TaskStatus; category: 'support' | 'compare' | 'process' | 'plan'; demo: boolean; messages: Message[]; draft: string; sources: Source[]; results?: Results | undefined; }
 const samples: Omit<Task, 'messages' | 'draft' | 'sources' | 'results'>[] = [
   { id: 'moving', title: 'A fresh start in a new city', description: 'Getting the essentials sorted for my upcoming move.', status: 'Planning', category: 'plan', demo: true },
   { id: 'insurance', title: 'Find the right health insurance', description: 'Comparing coverage, costs, and what matters to me.', status: 'Researching', category: 'compare', demo: true },
