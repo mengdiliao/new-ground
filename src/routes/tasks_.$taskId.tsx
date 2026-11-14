@@ -4,7 +4,7 @@ import { TaskWorkspace } from '@/components/task-workspace';
 import { Button } from '@/components/ui/button';
 import neighborhood from '@/assets/neighborhood-refined.png';
 export const Route = createFileRoute('/tasks_/$taskId')({
-  head: ({ params }) => ({ meta: [{ title: `Task ${params.taskId} — New Ground workspace` }, { name: 'description', content: 'Your conversation, progress, example sources, and next steps in one calm task workspace.' }, { property: 'og:title', content: `Task ${params.taskId} — New Ground` }, { property: 'og:description', content: 'A little clarity, one step at a time. Explore your local demo task workspace.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] }),
+  head: ({ params }) => ({ meta: [{ title: `Task ${params.taskId} — New Ground workspace` }, { name: 'description', content: 'Your conversation, progress, research sources, and next steps in one calm task workspace.' }, { property: 'og:title', content: `Task ${params.taskId} — New Ground` }, { property: 'og:description', content: 'A little clarity, one step at a time. Explore your conversation, research, and next steps.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] }),
   component: WorkspacePage,
 });
 function WorkspacePage() {

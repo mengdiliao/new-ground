@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, cleanup } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 vi.mock('@tanstack/react-start', () => ({ useServerFn: () => vi.fn() }));
-vi.mock('@/lib/exa-search.functions', () => ({ searchWeb: vi.fn() }));
+vi.mock('@/lib/agent.functions', () => ({ agentStep: vi.fn() }));
 import { NewGroundProvider } from '@/components/new-ground-provider';
 import { useNewGround } from '@/lib/task-context';
 

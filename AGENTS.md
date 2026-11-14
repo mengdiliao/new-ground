@@ -35,3 +35,4 @@ use the editor.
 - Keep credentials inside server-function handlers and normalize search responses in pure typed helpers; browser components receive only safe results and user-facing errors.
 - Store each workspace's conversation, draft, stage, sources, and results on its task record; pure workflow helpers and prop-driven panels keep future data integration independent of presentation.
 - Define shared React contexts and consumer hooks separately from refreshable provider components so live updates preserve provider-consumer identity.
+- Run explicit OpenAI Responses requests through bounded server-function steps using the existing Exa service; encrypted continuation state preserves context and enforces per-task search budgets without exposing internal tool payloads.
