@@ -1,18 +1,20 @@
 import { createContext, useContext, type Context } from 'react';
-import type { Task } from '@/lib/task-data';
+import type { Task, TaskStatus, ConversationType } from '@/lib/task-data';
 
 export interface TaskContextValue {
   tasks: Task[];
   allTasks: Task[];
-  addTask: (text: string) => Task | undefined;
-  newTask: () => Task;
+  addTask: (text: string, type?: ConversationType) => Task | undefined;
+  newTask: (type?: ConversationType) => Task;
   updateDraft: (id: string, text: string) => void;
   sendMessage: (id: string, text: string) => void;
   advanceTask: (id: string) => void;
   researchTask: (id: string, query: string) => Promise<void>;
   renameTask: (id: string, title: string) => void;
   deleteTask: (id: string) => void;
-  setTaskCompleted: (id: string, completed: boolean) => void;
+  setTaskStatus: (id: string, status: TaskStatus) => void;
+  convertQuery: (id: string) => void;
+  updateNotes: (id: string, notes: string) => void;
   toggleAction: (id: string, action: string) => void;
   historyReady: boolean;
   storageError: string;

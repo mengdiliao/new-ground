@@ -42,3 +42,7 @@ use the editor.
 - Store multiple moves in the existing versioned device-local profile adapter, migrating legacy profiles in place; explicit save and activation prevent setup from triggering research.
 - Mount the profile provider above task state; bind each task to its move and immutable research-context snapshot so switching never mixes histories, and changed research can be refreshed separately.
 - Validate minimal move context at the agent boundary and seal it into continuation state; only confirmed details personalize requests, with unknown identity never inferred from origin.
+
+- Keep query/task type explicit in the existing conversation record and migrate untyped history to queries; only user actions create tracked tasks.
+- Keep manual task status and device-local notes independent from AI processing; notes never enter research payloads.
+- Share history filtering and cards across home and history pages so category separation and move scoping stay consistent.
