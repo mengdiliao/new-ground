@@ -38,3 +38,4 @@ use the editor.
 - Store each workspace's conversation, draft, stage, sources, and results on its task record; pure workflow helpers and prop-driven panels keep future data integration independent of presentation.
 - Define shared React contexts and consumer hooks separately from refreshable provider components so live updates preserve provider-consumer identity.
 - Run explicit OpenAI Responses requests through bounded server-function steps using the existing Exa service; encrypted continuation state preserves context and enforces per-task search budgets without exposing internal tool payloads.
+- Keep every profile value explicitly null until the user sets it; locations are saved only from validated GeoNames suggestions picked in the LocationPicker, never from free text, and dashboard copy must render empty states instead of example values.
