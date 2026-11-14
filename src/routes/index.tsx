@@ -15,7 +15,7 @@ export const Route = createFileRoute('/')({
 const prompts = ["I'm moving to a new city next month", 'What should I sort out before I move?', 'How do I meet people in a new city?'];
 function Index() {
   return <main className="page-content home-refresh soft-enter">
-    <section className="change-welcome" aria-labelledby="welcome-heading"><p className="mb-5 flex items-center gap-2 text-sm font-semibold text-primary"><Sprout size={17} />New Ground · Less searching. More living.</p><ChangeBoard /><h1 id="welcome-heading">Meet your AI assistant<br className="hidden sm:block" /> for life in a new city.</h1><p className="change-intro">A summer job, an exchange, a new home. One change can lead to another. Tell us your plan — we’ll help you find a grounded next step.</p><RequestComposer prompts={prompts} /></section>
+    <section className="change-welcome" aria-labelledby="welcome-heading"><p className="mb-5 flex items-center gap-2 text-sm font-semibold text-primary"><Sprout size={17} />New Ground</p><ChangeBoard /><h1 id="welcome-heading">Meet your AI assistant<br className="hidden sm:block" /> for life in a new city.</h1><p className="change-intro">A summer job, an exchange, a new home. One change can lead to another. Tell us your plan — we’ll help you find a grounded next step.</p><RequestComposer prompts={prompts} /></section>
     <MoveCard />
     <section className="features-section" aria-labelledby="features-heading">
       <div className="mb-7 max-w-xl">
