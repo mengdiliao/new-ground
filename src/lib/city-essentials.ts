@@ -26,7 +26,7 @@ export function essentialKey(move: MoveProfile, category: EssentialCategory) {
 export function needsResearch(move: MoveProfile | null, category: EssentialCategory, cache: EssentialCache) { return Boolean(move?.destination && !cache[essentialKey(move, category)]); }
 export function normalizeItems(input: unknown, sources: Source[], moveId: string, destinationId: number, category: EssentialCategory, now: string): EssentialItem[] {
   return researchItemsSchema.parse(input).items.flatMap((item, index) => {
-    const references = item.sourceNumbers.map(number => sources[number - 1]).filter((source): source is Source => Boolean(source));
+    const references = item.sourceNumbers.map(number => sources[number - 1]).filter((source): source is Source => Boolean(source)).map(source => ({ ...source, domain: source.domain ?? new URL(source.url).hostname, highlights: source.highlights ?? [], preview: source.preview ?? '', publishedDate: source.publishedDate ?? null }));
     if (!references.length) return [];
     // Phone numbers must occur in retrieved evidence, not just model output.
     if (item.contactNumber && !references.some(source => source.highlights.some(text => text.replace(/[^\d+]/g, '').includes(item.contactNumber?.replace(/[^\d+]/g, '') ?? 'unverified')))) return [];

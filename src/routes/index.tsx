@@ -19,8 +19,8 @@ function Index() {
     <MoveCard />
     <section className="features-section" aria-labelledby="features-heading">
       <div className="mb-7 max-w-xl">
-        <h2 id="features-heading" className="text-2xl font-semibold">Make your new city feel like home.</h2>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">Everything you need to navigate your move, settle in, and find your people.</p>
+        <h2 id="features-heading" className="text-2xl font-semibold">City Essentials</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">Useful information for your move and everyday life.</p>
       </div>
       <div className="feature-grid">{features.map(feature => <FeatureCard feature={feature} key={feature.slug} />)}</div>
     </section>

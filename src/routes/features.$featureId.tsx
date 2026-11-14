@@ -7,6 +7,8 @@ import { RequestComposer } from '@/components/request-composer';
 import { findFeature } from '@/lib/features';
 import { useProfile } from '@/lib/profile-context';
 import { locationLabel } from '@/lib/locations';
+import { CityEssentialItems } from '@/components/city-essential-items';
+import type { EssentialCategory } from '@/lib/city-essentials';
 
 export const Route = createFileRoute('/features/$featureId')({
   head: ({ params }) => {
@@ -61,6 +63,7 @@ function FeaturePage() {
             <img src={feature.image} alt="" width={816} height={816} />
           </div>
         </div>
+        <CityEssentialItems key={`${feature.slug}-${profile.destination?.cityId}`} category={feature.slug as EssentialCategory} />
         <RequestComposer prompts={prompts} placeholder={`Ask about ${feature.title.toLowerCase()}…`} />
         <MoveDetails />
       </section>

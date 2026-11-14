@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { NewGroundProvider } from '@/components/new-ground-provider';
 import { ProfileProvider } from '@/components/profile-provider';
 import { AppShell } from '@/components/app-shell';
+import { CityEssentialsProvider } from '@/components/city-essentials-provider';
 
 function NotFoundComponent() {
   return (
@@ -127,7 +128,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <ProfileProvider><NewGroundProvider><AppShell><Outlet /></AppShell></NewGroundProvider></ProfileProvider>
+      <ProfileProvider><NewGroundProvider><CityEssentialsProvider><AppShell><Outlet /></AppShell></CityEssentialsProvider></NewGroundProvider></ProfileProvider>
     </QueryClientProvider>
   );
 }
