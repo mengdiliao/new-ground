@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { ArrowLeft, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { LocationPicker } from '@/components/location-picker';
+import { MoveCard } from '@/components/move-card';
+import { MoveDetails } from '@/components/move-details';
 import { RequestComposer } from '@/components/request-composer';
 import { findFeature } from '@/lib/features';
 import { useProfile } from '@/lib/profile-context';
@@ -19,7 +20,7 @@ export const Route = createFileRoute('/features/$featureId')({
 
 function FeaturePage() {
   const { featureId } = Route.useParams();
-  const { profile, saveProfile, profileReady } = useProfile();
+  const { profile, profileReady } = useProfile();
   const feature = findFeature(featureId);
 
   if (!feature) {
@@ -49,9 +50,7 @@ function FeaturePage() {
               <div className="feature-context">
                 <p className="flex items-center gap-2 text-xs font-semibold text-primary"><MapPin size={13} />Where are you headed?</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">Set your destination and every answer here is tailored to your city. You can also just ask away.</p>
-                <div className="mt-3 max-w-xs">
-                  <LocationPicker id="feature-destination" label="Destination" value={profile.destination} onSelect={location => saveProfile({ ...profile, destination: location })} placeholder="Search your new city" />
-                </div>
+                <MoveCard />
               </div>
             )}
             {profileReady && profile.destination && (
@@ -63,6 +62,7 @@ function FeaturePage() {
           </div>
         </div>
         <RequestComposer prompts={prompts} placeholder={`Ask about ${feature.title.toLowerCase()}…`} />
+        <MoveDetails />
       </section>
     </main>
   );
