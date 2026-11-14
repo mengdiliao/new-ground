@@ -9,6 +9,9 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        nav: "justify-start text-muted-foreground hover:bg-accent hover:text-foreground data-[active=true]:bg-accent data-[active=true]:text-primary",
+        suggestion: "h-auto items-start justify-start whitespace-normal border border-border bg-card text-card-foreground hover:border-primary/40 hover:bg-accent/30 shadow-none",
+        task: "h-auto items-start justify-start whitespace-normal border border-border bg-card text-card-foreground hover:border-primary/40 shadow-none",
         default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
         destructive: "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:

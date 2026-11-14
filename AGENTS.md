@@ -28,3 +28,7 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Application architecture
+- Keep shared navigation and session-only task state in a root-mounted application provider and shell; leaf routes own their page content and metadata.
+- Keep the first-stage assistant frontend-only, with explicit demo results and no external requests for task processing.
