@@ -366,6 +366,9 @@ svg { stroke-linecap: round; stroke-linejoin: round; }
 .essential-row { display: flex; align-items: start; gap: 12px; width: 100%; height: auto; min-height: 84px; padding: 14px 0; white-space: normal; text-align: left; border-radius: 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
 .essential-row:hover { background: var(--muted); }
 .essential-row > svg { margin-top: 3px; }
+.research-image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.research-image-button { position: relative; width: 100%; height: auto; aspect-ratio: 3 / 2; padding: 0; overflow: hidden; border-radius: 12px; background: var(--muted); }
+.research-image-button img { width: 100%; height: 100%; object-fit: cover; }
 .essential-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
 @media (max-width: 767px) { .essential-list { grid-template-columns: 1fr; } .essential-hub .feature-illustration { width: 76px; height: 92px; } }
 

@@ -12,6 +12,7 @@ import { updatedLabel } from '@/lib/task-history';
 import { useProfile } from '@/lib/profile-context';
 import { moveRevision } from '@/lib/profile';
 import { useNavigate } from '@tanstack/react-router';
+import { ResearchImageGallery } from '@/components/research-image-gallery';
 
 function AnswerText({ text }: { text: string }) {
   return <>{text.split(/(\*\*[^*]+\*\*)/g).map((part, index) => part.startsWith('**') && part.endsWith('**') ? <strong key={index}>{part.slice(2, -2)}</strong> : part)}</>;

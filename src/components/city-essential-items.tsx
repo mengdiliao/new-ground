@@ -7,6 +7,8 @@ import { useEssentials } from '@/lib/city-essentials-context';
 import { essentialKey, isOutdated, itemContext, type EssentialCategory, type EssentialItem } from '@/lib/city-essentials';
 import { useProfile } from '@/lib/profile-context';
 import { useNewGround } from '@/lib/task-context';
+import { ResearchImageGallery } from '@/components/research-image-gallery';
+import { selectedImages } from '@/lib/research-images';
 
 const labels = { 'source-supported': 'Source-supported', conditional: 'Check applicability', 'needs-information': 'Needs more information' };
 export function CityEssentialItems({ category, compact = false }: { category: EssentialCategory; compact?: boolean }) {
@@ -42,6 +44,7 @@ function EssentialDetail({ item }: { item: EssentialItem }) {
   return <DialogContent className="max-h-[85dvh] w-[calc(100%-32px)] max-w-xl overflow-y-auto rounded-xl">
     <DialogTitle className="pr-6 leading-6">{item.title}</DialogTitle>
     <DialogDescription>{item.shortSummary}</DialogDescription>
+    <ResearchImageGallery images={selectedImages(item.sourceReferences)} />
     <p className="text-xs font-semibold text-primary">{labels[item.applicabilityStatus]} · {item.region}</p>
     {item.contactNumber && <p className="text-3xl font-bold">{item.contactNumber}</p>}
     <p className="whitespace-pre-line text-sm leading-7">{item.detailedExplanation}</p>
