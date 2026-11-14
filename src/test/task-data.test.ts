@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { createLocalTask, sampleTasks } from '@/lib/task-data';
+import { createLocalTask, createDraftTask, appendMessage, advanceDemo, sampleTasks } from '@/lib/task-data';
 describe('Frontend-only task foundation', () => {
-  it('creates a local planning task from user input', () => { expect(createLocalTask('  Plan my move  ', 'local-1')).toEqual({ id: 'local-1', title: 'Plan my move', description: 'Plan my move', status: 'Planning', category: 'plan', demo: false }); });
+  it('creates a local planning task preserving the original request', () => { const task = createLocalTask('  Plan my move  ', 'local-1'); expect(task?.title).toBe('Plan my move'); expect(task?.description).toBe('  Plan my move  '); expect(task?.messages[0].text).toBe('  Plan my move  '); expect(task?.status).toBe('Planning'); });
   it('does not create an empty task', () => { expect(createLocalTask('   ', 'empty')).toBeUndefined(); });
   it('clearly identifies necessary sample data as demo tasks', () => { expect(sampleTasks.length).toBe(3); expect(sampleTasks.every(task => task.demo)).toBe(true); expect(sampleTasks.map(task => task.status)).toEqual(['Planning', 'Researching', 'Completed']); });
+  it('starts a fresh workspace with no conversation or research', () => { const task = createDraftTask('fresh'); expect(task.messages).toEqual([]); expect(task.sources).toEqual([]); expect(task.results).toBeUndefined(); expect(task.draft).toBe(''); });
+  it('keeps conversations isolated between tasks', () => { const first = createDraftTask('first'); const second = createDraftTask('second'); const updated = appendMessage(first, 'Help with a move'); expect(updated.messages[0].text).toBe('Help with a move'); expect(first.messages).toEqual([]); expect(second.messages).toEqual([]); });
+  it('rejects whitespace follow-ups', () => { const task = createDraftTask('empty'); expect(appendMessage(task, '   ')).toBe(task); });
+  it('advances demo stages without arbitrary percentages', () => { const task = createLocalTask('Help plan a move', 'stages'); if (!task) throw new Error('Task missing'); const research = advanceDemo(task); const review = advanceDemo(research); const completed = advanceDemo(review); expect([task.status, research.status, review.status, completed.status]).toEqual(['Planning', 'Researching', 'Reviewing', 'Completed']); expect(task.sources).toEqual([]); expect(research.sources[0].url).toBe('https://www.usa.gov/'); expect(research.results).toBeUndefined(); expect(review.results?.steps).toHaveLength(3); expect(advanceDemo(completed)).toBe(completed); });
 });
