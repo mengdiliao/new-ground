@@ -54,7 +54,7 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
       for (let index = 0; index <= MAX_AGENT_STEPS + 1; index++) {
         const result = await step({ data: index === 0 ? { state, message: query, move: context, ...(!state ? { history } : {}) } : { state } });
         if (result.state) { state = result.state; states.current.set(id, state); }
-        updateTask(id, task => ({ ...task, agentState: state, agentStage: result.stage ?? task.agentStage, researchPlan: result.plan ?? task.researchPlan, sources: result.sources, searchRounds: result.rounds,
+        updateTask(id, task => ({ ...task, agentState: state, agentStage: result.stage ?? task.agentStage, researchPlan: result.plan ?? task.researchPlan, sources: result.sources.length ? result.sources : task.sources, searchRounds: result.rounds,
           searchState: result.done ? result.error ? 'error' : 'success' : 'loading', searchError: result.error,
           ...(result.answer ? { messages: [...task.messages, { id: crypto.randomUUID(), role: 'assistant' as const, text: result.answer }], results: result.clarification ? undefined : { summary: result.answer, options: [], steps: answerActions(result.answer) } } : {}) }));
         if (result.done) return;

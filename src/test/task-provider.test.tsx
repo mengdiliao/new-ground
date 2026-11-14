@@ -8,6 +8,8 @@ import { useNewGround } from '@/lib/task-context';
 import { ProfileProvider } from '@/components/profile-provider';
 import { useProfile } from '@/lib/profile-context';
 import { emptyProfile } from '@/lib/profile';
+import { createDraftTask } from '@/lib/task-data';
+import { saveTasks, loadTasks } from '@/lib/task-storage';
 
 afterEach(() => { cleanup(); window.localStorage.clear(); request.mockClear(); });
 
@@ -53,4 +55,12 @@ it('does not send personal notes or change manual progress when research finishe
   expect(screen.getByLabelText('Manual status')).toHaveTextContent('Waiting');
   expect(JSON.stringify(request.mock.calls)).not.toContain('PRIVATE NOTE');
   expect(request.mock.calls[0]?.[0]).toMatchObject({ data: { message: 'Find Oodi hours' } });
+});
+
+it('preserves earlier research sources when a follow-up needs no new search', async () => {
+  const sources = [{ title: 'Official library', preview: 'Opening hours', url: 'https://oodihelsinki.fi/' }];
+  saveTasks(window.localStorage, [{ ...createDraftTask('saved', 'task'), sources, notes: 'My note', status: 'Waiting' }]);
+  render(<ProfileProvider><NewGroundProvider><StatusConsumer /></NewGroundProvider></ProfileProvider>);
+  await act(async () => { fireEvent.click(screen.getByText('Run research')); });
+  expect(loadTasks(window.localStorage)[0]).toMatchObject({ sources, notes: 'My note', status: 'Waiting' });
 });
