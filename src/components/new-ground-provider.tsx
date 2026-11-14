@@ -58,7 +58,7 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
         if (result.state) { state = result.state; states.current.set(id, state); }
         for (const source of result.sources) if (source.images?.some(image => image.dataUrl)) imageSources.set(source.url, source);
         const enrichedSources = result.sources.map(source => imageSources.get(source.url) ?? source);
-        updateTask(id, task => ({ ...task, agentState: state, agentStage: result.stage ?? task.agentStage, researchPlan: result.plan ?? task.researchPlan, sources: result.sources.length ? result.sources : task.sources, searchRounds: result.rounds,
+        updateTask(id, task => ({ ...task, agentState: state, agentStage: result.stage ?? task.agentStage, researchPlan: result.plan ?? task.researchPlan, sources: enrichedSources.length ? enrichedSources : task.sources, searchRounds: result.rounds,
           searchState: result.done ? result.error ? 'error' : 'success' : 'loading', searchError: result.error,
           ...(result.answer ? { messages: [...task.messages, { id: crypto.randomUUID(), role: 'assistant' as const, text: result.answer, images: selectedImages(enrichedSources, result.imageSourceNumbers ?? []) }], results: result.clarification ? undefined : { summary: result.answer, options: [], steps: answerActions(result.answer) } } : {}) }));
         if (result.done) return;
