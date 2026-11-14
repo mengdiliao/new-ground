@@ -1,69 +1,21 @@
-import { Link, useNavigate } from '@tanstack/react-router';
-import { ArrowRight, ArrowLeftRight, CalendarDays, Hourglass, MapPin, Pencil, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, MapPin, Pencil, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { LocationPicker } from '@/components/location-picker';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { MoveSetup } from '@/components/move-setup';
 import { useProfile } from '@/lib/profile-context';
-import { useNewGround } from '@/lib/task-context';
-import { arrivalLabel, durationChoices, durationLabel, durationLabels, type DurationChoice, hasDestination, swapLocations } from '@/lib/profile';
+import { arrivalLabel, durationLabel } from '@/lib/profile';
 import { locationLabel } from '@/lib/locations';
 
-// Compact travel-inspired journey card: inline From/To pickers with a swap
-// control, plus arrival and duration. Every value stays unset until the user
-// picks it; arrival and duration are edited in the onboarding flow.
 export function MoveCard() {
-  const { profile, saveProfile, profileReady } = useProfile();
-  const { addTask, researchTask } = useNewGround();
-  const navigate = useNavigate();
+  const { activeMove, moves, saveMove, switchMove, profileReady, storageError } = useProfile();
+  const [mode, setMode] = useState<'edit' | 'new' | null>(null);
   if (!profileReady) return null;
-
-  const researchMove = () => {
-    if (!profile.destination) return;
-    const parts = [`I'm moving to ${locationLabel(profile.destination)}`];
-    if (profile.origin) parts.push(`from ${locationLabel(profile.origin)}`);
-    const arrival = arrivalLabel(profile);
-    if (arrival !== 'Arrival date not set' && arrival !== 'Not sure yet') parts.push(`around ${arrival}`);
-    const duration = durationLabel(profile);
-    if (duration !== 'Duration not set' && duration !== 'Not sure yet') parts.push(`for ${duration.toLowerCase()}`);
-    const prompt = `${parts.join(' ')}. What should I sort out first?`;
-    const task = addTask(prompt);
-    if (!task) return;
-    void researchTask(task.id, prompt);
-    void navigate({ to: '/tasks/$taskId', params: { taskId: task.id } });
-  };
-
-  return (
-    <section className="move-card" aria-labelledby="move-heading">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 id="move-heading" className="flex items-center gap-2 text-base font-semibold"><MapPin size={17} className="text-primary" />Your move</h2>
-        <Button asChild variant="ghost" className="h-auto px-2 py-1 text-xs font-normal"><Link to="/onboarding"><Pencil size={12} />Arrival &amp; duration</Link></Button>
-      </div>
-      <div className="journey-row">
-        <LocationPicker id="move-origin" label="Moving from" value={profile.origin} onSelect={location => saveProfile({ ...profile, origin: location })} placeholder="Where from?" />
-        <button
-          type="button"
-          className="journey-swap"
-          aria-label="Swap origin and destination"
-          onClick={() => saveProfile(swapLocations(profile))}
-        >
-          <ArrowLeftRight size={15} />
-        </button>
-        <LocationPicker id="move-destination" label="Moving to" value={profile.destination} onSelect={location => saveProfile({ ...profile, destination: location })} placeholder="Where to?" />
-      </div>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <div className="move-fact"><label htmlFor="move-arrival" className="move-fact-label flex items-center gap-1"><CalendarDays size={11} />Arrival</label>
-          <input id="move-arrival" type="date" value={profile.arrival?.kind === 'exact' ? profile.arrival.date : ''} onChange={event => saveProfile({ ...profile, arrival: event.target.value ? { kind: 'exact', date: event.target.value } : null })} className="move-fact-input" />
-          {profile.arrival && profile.arrival.kind !== 'exact' && <p className="mt-1 text-xs text-muted-foreground">{arrivalLabel(profile)}</p>}
-        </div>
-        <div className="move-fact"><label htmlFor="move-duration" className="move-fact-label flex items-center gap-1"><Hourglass size={11} />Duration</label>
-          <select id="move-duration" value={profile.duration?.choice ?? ''} onChange={event => { const choice = event.target.value as DurationChoice | ''; saveProfile({ ...profile, duration: choice ? (choice === 'custom' ? { choice, custom: profile.duration?.custom } : { choice }) : null }); }} className="move-fact-input">
-            <option value="">Duration not set</option>
-            {durationChoices.filter(c => c !== 'custom' || profile.duration?.choice === 'custom').map(c => <option key={c} value={c}>{c === 'custom' ? durationLabel(profile) : durationLabels[c]}</option>)}
-          </select>
-        </div>
-      </div>
-      {hasDestination(profile)
-        ? <Button onClick={researchMove} className="mt-4 h-10"><Sparkles size={15} />Research my move<ArrowRight size={14} /></Button>
-        : <p className="mt-4 text-xs leading-5 text-muted-foreground">Pick a destination to unlock move research tailored to where you’re going. Everything stays optional — explore freely.</p>}
-    </section>
-  );
+  return <section className="move-card" aria-labelledby="move-heading">
+    <div className="flex flex-wrap items-center justify-between gap-3"><h2 id="move-heading" className="flex items-center gap-2 text-base font-semibold"><MapPin size={17} className="text-primary" />{activeMove ? 'Current Move' : 'Set up your move'}</h2>{activeMove && <div className="flex gap-1"><Button variant="ghost" className="h-8 px-2 text-xs" onClick={() => setMode('edit')}><Pencil size={13} />Edit Move</Button><Button variant="ghost" className="h-8 px-2 text-xs" onClick={() => setMode('new')}><Plus size={13} />New Move</Button></div>}</div>
+    {activeMove ? <><p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-medium">{activeMove.origin && <>{locationLabel(activeMove.origin)}<ArrowRight size={14} className="text-primary" /></>}{activeMove.destination && locationLabel(activeMove.destination)}</p><div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted-foreground">{activeMove.arrival && activeMove.arrival.kind !== 'unsure' && <span>Arrival: {arrivalLabel(activeMove)}</span>}{activeMove.duration && activeMove.duration.choice !== 'unsure' && <span>Duration: {durationLabel(activeMove)}</span>}</div></> : <><p className="mt-2 text-sm text-muted-foreground">A new chapter starts here. Add your destination; the rest can wait.</p><MoveSetup onSave={(profile, active) => saveMove(profile, undefined, active)} /></>}
+    {moves.length > 0 && <div className="mt-3 flex flex-wrap items-center gap-2"><label htmlFor="current-move" className="text-xs text-muted-foreground">Your moves</label><select id="current-move" value={activeMove?.id ?? ''} className="min-w-0 max-w-full rounded-lg border border-input bg-background px-2 py-1 text-xs" onChange={event => switchMove(event.target.value || null)}><option value="">No current move</option>{moves.map(move => <option key={move.id} value={move.id}>{move.destination ? locationLabel(move.destination) : 'Move'} · {move.status}</option>)}</select></div>}
+    <p className="mt-3 text-[11px] text-muted-foreground">Saved in this browser only.</p>{storageError && <p role="alert" className="mt-2 text-xs text-destructive">{storageError}</p>}
+    <Dialog open={mode !== null} onOpenChange={open => { if (!open) setMode(null); }}><DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-xl"><DialogHeader><DialogTitle>{mode === 'edit' ? 'Edit Move' : 'New Move'}</DialogTitle><DialogDescription>{mode === 'edit' ? 'Past conversations and checked steps stay unchanged.' : 'Start fresh. Your previous moves and research stay saved.'}</DialogDescription></DialogHeader>{mode && <MoveSetup key={`${mode}-${activeMove?.id}`} initial={mode === 'edit' ? activeMove ?? undefined : undefined} allowActivation={mode === 'new'} onCancel={() => setMode(null)} onSave={(profile, active) => { saveMove(profile, mode === 'edit' ? activeMove?.id : undefined, active); setMode(null); }} />}</DialogContent></Dialog>
+  </section>;
 }

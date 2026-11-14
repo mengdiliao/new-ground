@@ -1,10 +1,11 @@
 import { z } from 'zod';
 import type { Task } from './task-data';
+import { moveContextSchema } from './agent';
 export const TASK_STORAGE_KEY = 'new-ground.tasks.v1';
 const text = z.string();
 const source = z.object({ title: text, preview: text, url: z.string().url().refine(url => /^https?:\/\//.test(url)), domain: text.optional(), highlights: z.array(text).optional(), publishedDate: text.nullable().optional() });
 // Explicit allowlist: internal continuation state and credentials never persist.
-const savedTask = z.object({ id: text.min(1), title: text.min(1), description: text, status: z.enum(['Planning', 'Researching', 'Reviewing', 'Completed']), category: z.enum(['support', 'compare', 'process', 'plan']), demo: z.boolean(), messages: z.array(z.object({ id: text, role: z.enum(['user', 'assistant']), text })), draft: z.literal('').default(''), sources: z.array(source), results: z.object({ summary: text, options: z.array(text), steps: z.array(text) }).optional(), completedActions: z.array(text).default([]), createdAt: z.string().datetime(), updatedAt: z.string().datetime(), searchState: z.enum(['idle', 'loading', 'success', 'error']).optional(), searchRounds: z.number().int().min(0).max(3).optional(), researchPlan: text.optional() });
+const savedTask = z.object({ id: text.min(1), title: text.min(1), description: text, status: z.enum(['Planning', 'Researching', 'Reviewing', 'Completed']), category: z.enum(['support', 'compare', 'process', 'plan']), demo: z.boolean(), messages: z.array(z.object({ id: text, role: z.enum(['user', 'assistant']), text })), draft: z.literal('').default(''), sources: z.array(source), results: z.object({ summary: text, options: z.array(text), steps: z.array(text) }).optional(), completedActions: z.array(text).default([]), createdAt: z.string().datetime(), updatedAt: z.string().datetime(), searchState: z.enum(['idle', 'loading', 'success', 'error']).optional(), searchRounds: z.number().int().min(0).max(3).optional(), researchPlan: text.optional(), moveId: text.nullable().optional(), moveRevision: text.optional(), moveSnapshot: moveContextSchema.nullable().optional() });
 export interface TaskStorage { getItem(key: string): string | null; setItem(key: string, value: string): void; }
 export function loadTasks(storage: TaskStorage): Task[] {
   const raw = storage.getItem(TASK_STORAGE_KEY);

@@ -3,7 +3,7 @@ export type TaskStatus = typeof taskStages[number];
 export interface Message { id: string; role: 'user' | 'assistant'; text: string; }
 export interface Source { title: string; preview: string; url: string; domain?: string | undefined; highlights?: string[] | undefined; publishedDate?: string | null | undefined; }
 export interface Results { summary: string; options: string[]; steps: string[]; }
-export interface Task { id: string; title: string; description: string; status: TaskStatus; category: 'support' | 'compare' | 'process' | 'plan'; demo: boolean; messages: Message[]; draft: string; sources: Source[]; results?: Results | undefined; searchState?: 'idle' | 'loading' | 'success' | 'error' | undefined; searchError?: string | undefined; agentState?: string | undefined; agentStage?: import('./agent').AgentStage | undefined; searchRounds?: number | undefined; researchPlan?: string | undefined; createdAt?: string; updatedAt?: string; completedActions?: string[]; }
+export interface Task { id: string; title: string; description: string; status: TaskStatus; category: 'support' | 'compare' | 'process' | 'plan'; demo: boolean; messages: Message[]; draft: string; sources: Source[]; results?: Results | undefined; searchState?: 'idle' | 'loading' | 'success' | 'error' | undefined; searchError?: string | undefined; agentState?: string | undefined; agentStage?: import('./agent').AgentStage | undefined; searchRounds?: number | undefined; researchPlan?: string | undefined; createdAt?: string; updatedAt?: string; completedActions?: string[]; moveId?: string | null | undefined; moveRevision?: string | undefined; moveSnapshot?: import('./profile').MoveContext | null | undefined; }
 const samples: Omit<Task, 'messages' | 'draft' | 'sources' | 'results'>[] = [
   { id: 'moving', title: 'A fresh start in a new city', description: 'Getting the essentials sorted for my upcoming move.', status: 'Planning', category: 'plan', demo: true },
   { id: 'insurance', title: 'Find the right health insurance', description: 'Comparing coverage, costs, and what matters to me.', status: 'Researching', category: 'compare', demo: true },
@@ -22,7 +22,7 @@ export function createLocalTask(text: string, id: string): Task | undefined {
 }
 export function appendMessage(task: Task, text: string): Task {
   if (!text.trim()) return task;
-  if (!task.description) return createLocalTask(text, task.id) ?? task;
+  if (!task.description) { const created = createLocalTask(text, task.id); return created ? { ...task, ...created, moveId: task.moveId, moveRevision: task.moveRevision, moveSnapshot: task.moveSnapshot } : task; }
   if (!task.demo) return { ...task, draft: '', messages: [...task.messages, { id: `${task.id}-${task.messages.length}`, role: 'user', text }] };
   return { ...task, draft: '', messages: [...task.messages, { id: `${task.id}-${task.messages.length}`, role: 'user', text }, { id: `${task.id}-${task.messages.length + 1}`, role: 'assistant', text: 'I’ve added that context to this demo conversation. Keep your priorities, constraints, and timeline in mind as you review the example plan. No live research has been performed.' }] };
 }

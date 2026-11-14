@@ -1,8 +1,9 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, type Context } from 'react';
 import type { Task } from '@/lib/task-data';
 
 export interface TaskContextValue {
   tasks: Task[];
+  allTasks: Task[];
   addTask: (text: string) => Task | undefined;
   newTask: () => Task;
   updateDraft: (id: string, text: string) => void;
@@ -21,7 +22,11 @@ export interface TaskContextValue {
 
 // Separate from the refreshable provider so live component updates do not
 // replace the context object used by already-mounted consumers.
-export const TaskContext = createContext<TaskContextValue | undefined>(undefined);
+// Context modules are not refresh boundaries. Retain their object across Vite
+// updates so an already-mounted provider still matches refreshed consumers.
+const hot = import.meta.hot;
+export const TaskContext: Context<TaskContextValue | undefined> = hot?.data?.taskContext ?? createContext<TaskContextValue | undefined>(undefined);
+if (hot?.data) hot.data.taskContext = TaskContext;
 
 export function useNewGround() {
   const context = useContext(TaskContext);
