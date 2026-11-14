@@ -9,6 +9,8 @@ export interface TaskContextValue {
   updateDraft: (id: string, text: string) => void;
   sendMessage: (id: string, text: string) => void;
   advanceTask: (id: string) => void;
+  editCalendar: (id: string, draft: import('./calendar-draft').CalendarDraft) => void;
+  cancelCalendar: (id: string, draftId: string) => void;
   editEmail: (id: string, draft: import('./email-draft').EmailDraft) => void;
   cancelEmail: (id: string, draftId: string) => void;
   researchTask: (id: string, query: string, emailRewrite?: boolean) => Promise<void>;
