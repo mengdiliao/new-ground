@@ -1,8 +1,8 @@
 # New Ground frontend
 ## Image-rich research
-- [ ] Extend existing Exa metadata, normalize relevant source images, and cache attribution with research.
-- [ ] Add optional source-backed visuals to city items and conversational answers with safe text-only fallbacks.
-- [ ] Verify real city/community searches, source attribution, image failures and responsive presentation.
+- [x] Extend existing Exa metadata, normalize relevant source images, and cache attribution with research.
+- [x] Add optional source-backed visuals to city items and conversational answers with safe text-only fallbacks.
+- [x] Verify real city/community searches, source attribution, image failures and responsive presentation.
 ## City Essentials
 - [x] Add bounded automatic research, source-backed structured items, and move/category-specific local caching.
 - [x] Add preview hubs, full lists, detail/source dialogs, contextual queries and confirmed task creation.
