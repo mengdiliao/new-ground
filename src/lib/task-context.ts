@@ -25,8 +25,8 @@ export interface TaskContextValue {
 // Context modules are not refresh boundaries. Retain their object across Vite
 // updates so an already-mounted provider still matches refreshed consumers.
 const hot = import.meta.hot;
-export const TaskContext: Context<TaskContextValue | undefined> = hot?.data.taskContext ?? createContext<TaskContextValue | undefined>(undefined);
-if (hot) hot.data.taskContext = TaskContext;
+export const TaskContext: Context<TaskContextValue | undefined> = hot?.data?.taskContext ?? createContext<TaskContextValue | undefined>(undefined);
+if (hot?.data) hot.data.taskContext = TaskContext;
 
 export function useNewGround() {
   const context = useContext(TaskContext);
