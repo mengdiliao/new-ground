@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { runAgentStep } from '@/lib/agent.server';
 import { DEFAULT_OPENAI_MODEL, groundedText, type AgentReply } from '@/lib/agent';
+import { emptyCalendar } from '@/lib/calendar-draft';
+import { emptyProfile, moveContext } from '@/lib/profile';
 
 const config = { openaiKey: 'test-credential', exaKey: 'test-credential', stateKey: 'test-signing-key', model: DEFAULT_OPENAI_MODEL };
 const toolResponse = (id: string) => Response.json({ id, output: [{ type: 'function_call', name: 'exa_search', call_id: `call-${id}`, arguments: JSON.stringify({ query: 'Helsinki library opening hours' }) }] });
@@ -8,6 +10,20 @@ const answerResponse = () => Response.json({ id: 'answer', output: [{ type: 'mes
 const searchResponse = () => Response.json({ results: [{ title: 'Library', url: 'https://example.org/library', highlights: ['Opening hours vary by day.'] }] });
 
 describe('OpenAI assistant safety and orchestration', () => {
+  it('supplies the real current instant and verified destination zone for relative calendar dates', async () => {
+    const before = Date.now();
+    const fetcher = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body));
+      const match = body.instructions.match(/Actual current UTC instant: ([^ ]+)\./);
+      expect(Date.parse(match?.[1] ?? '')).toBeGreaterThanOrEqual(before);
+      expect(body.instructions).toContain('Verified destination time zone: Europe/Helsinki');
+      return Response.json({ id: 'calendar', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({ answer: 'Choose the date.', plan: '', needsClarification: true, calendarAction: { ...emptyCalendar, title: 'Office visit' } }) }] }] });
+    }) as unknown as typeof fetch;
+    const move = moveContext({ ...emptyProfile, id: 'move', purpose: null, status: 'active', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), confirmedDetails: {}, destination: { cityId: 658225, cityName: 'Helsinki', countryCode: 'FI', countryName: 'Finland' } });
+    let result = await runAgentStep({ message: 'Add a registration office visit to my calendar.', move }, config, fetcher);
+    while (!result.done) result = await runAgentStep({ state: result.state }, config, fetcher);
+    expect(result.calendarAction?.startDate).toBe(''); expect(result.clarification).toBe(true); expect(result.rounds).toBe(0);
+  });
   it('returns a structured email with no recipient or search for a basic drafting request', async () => {
     const fetcher = vi.fn(async () => Response.json({ id: 'email', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({ answer: 'Review your email below.', plan: '', needsClarification: false, imageSourceNumbers: [], emailAction: { recipientName: '', to: '', cc: '', subject: 'Earlier move-in', body: 'Dear landlord,\nMay I move in earlier?\n[Your name]', language: 'English', sourceNumbers: [] } }) }] }] })) as unknown as typeof fetch;
     let result = await runAgentStep({ message: 'Write an email asking my landlord about moving in earlier.' }, config, fetcher);

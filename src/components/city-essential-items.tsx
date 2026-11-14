@@ -8,6 +8,7 @@ import { essentialKey, isOutdated, itemContext, type EssentialCategory, type Ess
 import { useProfile } from '@/lib/profile-context';
 import { useNewGround } from '@/lib/task-context';
 import { ResearchImageGallery } from '@/components/research-image-gallery';
+import { AddToCalendar } from '@/components/add-to-calendar';
 import { selectedImages } from '@/lib/research-images';
 
 const labels = { 'source-supported': 'Source-supported', conditional: 'Check applicability', 'needs-information': 'Needs more information' };
@@ -52,7 +53,7 @@ function EssentialDetail({ item }: { item: EssentialItem }) {
     {item.qualification && <p className="border-l-2 border-brand-coral pl-3 text-xs leading-6 text-muted-foreground">{item.qualification}</p>}
     {item.question && <div><label htmlFor="essential-answer" className="text-sm font-medium">{item.question}</label><input id="essential-answer" value={answer} maxLength={300} onChange={event => setAnswer(event.target.value)} placeholder="Your answer · optional" className="mt-2 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" /><Button asChild variant="link" size="sm"><Link to="/onboarding">Confirm your move details<ArrowUpRight size={12} /></Link></Button></div>}
     <div className="border-t border-border pt-3"><h4 className="text-xs font-semibold">Sources</h4>{item.sourceReferences.map(source => <Button key={source.url} variant="link" asChild className="h-auto w-full justify-start whitespace-normal px-0 py-2 text-left text-xs"><a href={source.url} target="_blank" rel="noopener noreferrer"><ExternalLink size={12} />{source.title}</a></Button>)}<p className="text-[10px] text-muted-foreground">Last researched {new Date(item.researchedAt).toLocaleString()}</p></div>
-    <div className="flex flex-wrap gap-2"><Button onClick={ask}><MessageCircle size={14} />Ask AI about this</Button>{item.actionable && <Button variant="outline" disabled={added} onClick={() => setConfirm(true)}>{added ? <Check size={14} /> : <Plus size={14} />}{added ? 'Added to Tasks' : 'Add to Tasks'}</Button>}</div>
+    <div className="flex flex-wrap gap-2"><AddToCalendar title={item.title} context={itemContext(item)} sources={item.sourceReferences} /><Button onClick={ask}><MessageCircle size={14} />Ask AI about this</Button>{item.actionable && <Button variant="outline" disabled={added} onClick={() => setConfirm(true)}>{added ? <Check size={14} /> : <Plus size={14} />}{added ? 'Added to Tasks' : 'Add to Tasks'}</Button>}</div>
     {confirm && <div className="border-t border-border pt-3"><p className="mb-2 text-xs">Create a tracked task with this information and its sources?</p><div className="flex gap-2"><Button size="sm" onClick={add}>Confirm add</Button><Button size="sm" variant="ghost" onClick={() => setConfirm(false)}>Cancel</Button></div></div>}
   </DialogContent>;
 }
