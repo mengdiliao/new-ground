@@ -8,6 +8,22 @@ const answerResponse = () => Response.json({ id: 'answer', output: [{ type: 'mes
 const searchResponse = () => Response.json({ results: [{ title: 'Library', url: 'https://example.org/library', highlights: ['Opening hours vary by day.'] }] });
 
 describe('OpenAI assistant safety and orchestration', () => {
+  it('returns a structured email with no recipient or search for a basic drafting request', async () => {
+    const fetcher = vi.fn(async () => Response.json({ id: 'email', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({ answer: 'Review your email below.', plan: '', needsClarification: false, imageSourceNumbers: [], emailAction: { recipientName: '', to: '', cc: '', subject: 'Earlier move-in', body: 'Dear landlord,\nMay I move in earlier?\n[Your name]', language: 'English', sourceNumbers: [] } }) }] }] })) as unknown as typeof fetch;
+    let result = await runAgentStep({ message: 'Write an email asking my landlord about moving in earlier.' }, config, fetcher);
+    while (!result.done) result = await runAgentStep({ state: result.state }, config, fetcher);
+    expect(result.emailAction).toMatchObject({ to: '', subject: 'Earlier move-in' }); expect(result.rounds).toBe(0); expect(fetcher).toHaveBeenCalledOnce();
+  });
+  it('passes the edited draft into revisions and rejects an invented recipient', async () => {
+    const draft = { id: 'existing', recipientName: '', to: 'owner@example.org', cc: '', subject: 'My edited subject', body: 'My edited body', language: 'English', sourceNumbers: [] };
+    const fetcher = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)); expect(body.instructions).toContain('My edited subject'); expect(body.instructions).toContain('My edited body');
+      return Response.json({ id: 'revision', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({ answer: 'Updated.', plan: '', needsClarification: false, emailAction: { ...draft, to: 'fake@example.org', body: 'Dear landlord, please confirm.' } }) }] }] });
+    }) as unknown as typeof fetch;
+    let result = await runAgentStep({ message: 'Make that email more formal.', emailDraft: draft }, config, fetcher);
+    while (!result.done) result = await runAgentStep({ state: result.state }, config, fetcher);
+    expect(result.emailAction?.body).toBe('Dear landlord, please confirm.'); expect(result.emailAction?.to).toBe('');
+  });
   it('restores saved conversation context without a persisted continuation token', async () => {
     const fetcher = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
       const body = JSON.parse(String(init?.body)); expect(body.input).toEqual([{ role: 'user', content: 'Help me move.' }, { role: 'assistant', content: 'Which city?' }, { role: 'user', content: 'Helsinki.' }]); return answerResponse();
