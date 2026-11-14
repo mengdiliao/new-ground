@@ -1,9 +1,9 @@
 # New Ground frontend
 ## Claude-inspired presentation
 - [ ] Review the new task-history and persistence brief and implement its requested changes after visual checks.
-- [ ] Refresh homepage typography and add a reduced-motion-aware rotating word board.
-- [ ] Add nine dedicated topic pages with suggested questions using the unchanged research workflow.
-- [ ] Verify topic navigation, live answers, existing tests, and desktop/mobile layout.
+- [x] Refresh homepage typography and add a reduced-motion-aware rotating word board.
+- [x] Add nine dedicated topic pages with suggested questions using the unchanged research workflow.
+- [x] Verify topic navigation, live answers, existing tests, and desktop/mobile layout.
 
 - [x] Establish the warm visual system and illustrated homepage.
 - [x] Add sidebar navigation, demo task views, and local task creation.

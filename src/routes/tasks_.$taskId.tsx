@@ -8,7 +8,8 @@ export const Route = createFileRoute('/tasks_/$taskId')({
   component: WorkspacePage,
 });
 function WorkspacePage() {
-  const { taskId } = Route.useParams(); const { tasks } = useNewGround(); const task = tasks.find(item => item.id === taskId);
-  if (!task) return <main className="page-content py-16 text-center"><img className="empty-world" src={neighborhood} width={1536} height={1024} alt="A quiet miniature neighborhood" /><h1 className="text-2xl font-semibold">This task isn't here anymore.</h1><p className="my-5 text-sm text-muted-foreground">Tasks last for this preview session. A refresh starts a new session.</p><Button asChild><Link to="/tasks">Back to My Tasks</Link></Button></main>;
+  const { taskId } = Route.useParams(); const { tasks, historyReady } = useNewGround(); const task = tasks.find(item => item.id === taskId);
+  if (!historyReady) return <main className="page-content"><p role="status">Opening your saved task…</p></main>;
+  if (!task) return <main className="page-content py-16 text-center"><img className="empty-world" src={neighborhood} width={1536} height={1024} alt="A quiet miniature neighborhood" /><h1 className="text-2xl font-semibold">This task isn't here anymore.</h1><p className="my-5 text-sm text-muted-foreground">It may have been deleted or saved in a different browser.</p><Button asChild><Link to="/tasks">Back to My Tasks</Link></Button></main>;
   return <TaskWorkspace key={task.id} task={task} />;
 }

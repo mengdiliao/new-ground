@@ -5,7 +5,7 @@ vi.mock('@/lib/agent.functions', () => ({ agentStep: vi.fn() }));
 import { NewGroundProvider } from '@/components/new-ground-provider';
 import { useNewGround } from '@/lib/task-context';
 
-afterEach(cleanup);
+afterEach(() => { cleanup(); window.localStorage.clear(); });
 
 function Consumer() {
   const { tasks, addTask } = useNewGround();
