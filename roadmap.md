@@ -1,8 +1,8 @@
 # New Ground frontend
 ## Proactive suggestions
-- [ ] Add optional single-action suggestions with recent-conversation repetition controls.
-- [ ] Reuse email/calendar cards and explicit task confirmation beneath replies.
-- [ ] Test suggestions, task isolation, and live click-to-open flows.
+- [x] Add optional single-action suggestions with recent-conversation repetition controls.
+- [x] Reuse email/calendar cards and explicit task confirmation beneath replies.
+- [x] Test suggestions, task isolation, and live email/calendar click-to-open flows; all 143 tests pass.
 ## Calendar Assistant
 - [x] Add typed calendar drafts to the existing AI with current-date context, reliable destination time zones, and task isolation.
 - [x] Add editable cards and reusable calendar actions for chats, research, and city items, with Google links and calendar files.
