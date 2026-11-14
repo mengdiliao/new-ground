@@ -1,4 +1,8 @@
 # New Ground frontend
+## Email Assistant
+- [ ] Add structured, evidence-checked email actions to the existing assistant without task progress changes.
+- [ ] Add session-only editing, rewriting, translation, copy, and user-initiated mail handoffs.
+- [ ] Verify live drafting, revisions, mail links, safety, and desktop/mobile presentation.
 ## Image-rich research
 - [x] Extend existing Exa metadata, normalize relevant source images, and cache attribution with research.
 - [x] Add optional source-backed visuals to city items and conversational answers with safe text-only fallbacks.
