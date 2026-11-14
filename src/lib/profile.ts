@@ -9,7 +9,7 @@ export interface DurationPlan { choice: DurationChoice; custom?: string | undefi
 export interface Profile { origin: LocationValue | null; destination: LocationValue | null; arrival: ArrivalPlan | null; duration: DurationPlan | null; updatedAt?: string | undefined; }
 export const detailLabels = { purpose: 'Moving purpose', housing: 'Housing preferences', budget: 'Budget', interests: 'Hobbies and interests', language: 'Language preferences', residency: 'Citizenship or residency circumstances' } as const;
 export type MoveDetail = keyof typeof detailLabels;
-export interface MoveProfile extends Profile { id: string; createdAt: string; updatedAt: string; status: 'active' | 'archived' | 'completed'; purpose: string | null; confirmedDetails: Partial<Record<MoveDetail, string>>; }
+export interface MoveProfile extends Profile { id: string; createdAt: string; updatedAt: string; status: 'active' | 'archived' | 'completed'; purpose: string | null; confirmedDetails: Partial<Record<MoveDetail, string | undefined>>; }
 export interface MoveStore { version: 2; activeMoveId: string | null; moves: MoveProfile[]; }
 export const emptyMoveStore: MoveStore = { version: 2, activeMoveId: null, moves: [] };
 
