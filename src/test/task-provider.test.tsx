@@ -10,6 +10,7 @@ import { useProfile } from '@/lib/profile-context';
 import { emptyProfile } from '@/lib/profile';
 import { createDraftTask } from '@/lib/task-data';
 import { saveTasks, loadTasks } from '@/lib/task-storage';
+import type { AgentReply } from '@/lib/agent';
 
 afterEach(() => { cleanup(); window.localStorage.clear(); request.mockClear(); });
 
@@ -72,4 +73,30 @@ it('preserves City Essentials references on explicitly created tasks', () => {
   fireEvent.click(screen.getByText('Confirm essential'));
   expect(loadTasks(window.localStorage)[0]).toMatchObject({ type: 'task', status: 'Not Started', sources });
   expect(request).not.toHaveBeenCalled();
+});
+
+it('keeps email drafting and rewriting inside the same task without altering its progress or history count', async () => {
+  const original = { ...createDraftTask('email-task', 'task'), status: 'Waiting' as const, notes: 'PRIVATE', results: { summary: 'Existing research', options: [], steps: ['Existing step'] }, completedActions: ['Existing step'] };
+  saveTasks(window.localStorage, [original]);
+  const email = { recipientName: '', to: '', cc: '', subject: 'Move-in request', body: 'May I move in earlier?', language: 'English', sourceNumbers: [] };
+  request.mockResolvedValueOnce({ done: true, sources: [], rounds: 0, emailAction: email } as AgentReply);
+  function EmailConsumer() {
+    const { tasks, researchTask, editEmail, cancelEmail } = useNewGround(); const task = tasks[0]; const draft = task?.messages.find(message => message.emailDraft)?.emailDraft;
+    return <><output aria-label="Email state">{JSON.stringify(task)}</output><button onClick={() => { if (task) void researchTask(task.id, 'Write an email to my landlord'); }}>Draft email</button><button onClick={() => { if (task && draft) editEmail(task.id, { ...draft, to: 'owner@example.org', cc: 'cc@example.org', body: 'Manually edited body' }); }}>Edit email</button><button onClick={() => { if (task) void researchTask(task.id, 'More formal', true); }}>Rewrite email</button><button onClick={() => { if (task && draft) cancelEmail(task.id, draft.id); }}>Cancel email</button></>;
+  }
+  render(<ProfileProvider><NewGroundProvider><EmailConsumer /></NewGroundProvider></ProfileProvider>);
+  await act(async () => { fireEvent.click(screen.getByText('Draft email')); });
+  const state = () => JSON.parse(screen.getByLabelText('Email state').textContent ?? '{}');
+  const id = state().messages[0].emailDraft.id;
+  fireEvent.click(screen.getByText('Edit email'));
+  request.mockResolvedValueOnce({ done: true, sources: [], rounds: 0, emailAction: { ...email, to: 'unrelated@example.org', body: 'A formal revision' } } as AgentReply);
+  await act(async () => { fireEvent.click(screen.getByText('Rewrite email')); });
+  expect(request.mock.calls.at(-1)?.[0]).toMatchObject({ data: { emailDraft: { to: 'owner@example.org', body: 'Manually edited body' } } });
+  expect(state().messages).toHaveLength(1);
+  expect(state().messages[0].emailDraft).toMatchObject({ id, to: 'owner@example.org', cc: 'cc@example.org', body: 'A formal revision' });
+  expect(state()).toMatchObject({ status: 'Waiting', notes: 'PRIVATE', results: original.results, completedActions: ['Existing step'] });
+  expect(loadTasks(window.localStorage)).toHaveLength(1);
+  expect(loadTasks(window.localStorage)[0]?.messages).toEqual([]);
+  fireEvent.click(screen.getByText('Cancel email'));
+  expect(state().messages).toEqual([]);
 });
