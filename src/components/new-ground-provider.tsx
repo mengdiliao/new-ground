@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { agentStep } from '@/lib/agent.functions';
 import { MAX_AGENT_STEPS } from '@/lib/agent';
-import { createLocalTask, createDraftTask, appendMessage, advanceDemo, type Task, type ConversationType } from '@/lib/task-data';
+import { createLocalTask, createDraftTask, appendMessage, advanceDemo, type Task, type ConversationType, type Source } from '@/lib/task-data';
 import { TaskContext } from '@/lib/task-context';
 import { loadTasks, saveTasks } from '@/lib/task-storage';
 import { renameTask, toggleAction, answerActions, convertToTask, changeTaskStatus, updateTaskNotes } from '@/lib/task-history';
@@ -32,9 +32,9 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
   const activeRequests = useRef(new Set<string>());
   const taskMoves = useRef(new Map<string, Task>());
   const bindMove = (task: Task): Task => ({ ...task, moveId: activeMove?.id ?? null, moveRevision: activeMove ? moveRevision(activeMove) : undefined, moveSnapshot: activeMove ? moveContext(activeMove) : null });
-  const addTask = (text: string, type: ConversationType = 'query') => {
+  const addTask = (text: string, type: ConversationType = 'query', sources: Source[] = []) => {
     const created = createLocalTask(text, crypto.randomUUID(), type);
-    const task = created ? bindMove(created) : undefined;
+    const task = created ? bindMove({ ...created, sources }) : undefined;
     if (task) { taskMoves.current.set(task.id, task); setTasks(current => [task, ...current]); }
     return task;
   };

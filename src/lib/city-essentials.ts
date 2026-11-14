@@ -29,7 +29,10 @@ export function normalizeItems(input: unknown, sources: Source[], moveId: string
     const references = item.sourceNumbers.map(number => sources[number - 1]).filter((source): source is Source => Boolean(source)).map(source => ({ ...source, domain: source.domain ?? new URL(source.url).hostname, highlights: source.highlights ?? [], preview: source.preview ?? '', publishedDate: source.publishedDate ?? null }));
     if (!references.length) return [];
     // Phone numbers must occur in retrieved evidence, not just model output.
-    if (item.contactNumber && !references.some(source => source.highlights.some(text => text.replace(/[^\d+]/g, '').includes(item.contactNumber?.replace(/[^\d+]/g, '') ?? 'unverified')))) return [];
+    if (item.contactNumber) {
+      const digits = item.contactNumber.replace(/[^\d]/g, '');
+      if (!digits || !references.some(source => source.highlights.some(text => (text.match(/\+?\d[\d ()-]*\d|\d/g) ?? []).some(number => number.replace(/[^\d]/g, '') === digits)))) return [];
+    }
     const needsIdentity = ['moving-requirements', 'arrival-checklist'].includes(category);
     return [{ ...item, title: cleanHighlight(item.title), shortSummary: cleanHighlight(item.shortSummary), sourceReferences: references, applicabilityStatus: needsIdentity && item.applicabilityStatus === 'source-supported' ? 'conditional' as const : item.applicabilityStatus, id: `${moveId}-${category}-${index}-${now}`, featureCategory: category, destinationId, associatedMoveId: moveId, researchedAt: now }];
   });
