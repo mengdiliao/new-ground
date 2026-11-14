@@ -1,0 +1,76 @@
+import { describe, expect, it, vi } from 'vitest';
+import { runAgentStep } from '@/lib/agent.server';
+import { DEFAULT_OPENAI_MODEL, groundedText, type AgentReply } from '@/lib/agent';
+
+const config = { openaiKey: 'test-credential', exaKey: 'test-credential', stateKey: 'test-signing-key', model: DEFAULT_OPENAI_MODEL };
+const toolResponse = (id: string) => Response.json({ id, output: [{ type: 'function_call', name: 'exa_search', call_id: `call-${id}`, arguments: JSON.stringify({ query: 'Helsinki library opening hours' }) }] });
+const answerResponse = () => Response.json({ id: 'answer', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({ plan: 'Check official library guidance.', answer: 'Check the official page for the date you need [1].', needsClarification: false }) }] }] });
+const searchResponse = () => Response.json({ results: [{ title: 'Library', url: 'https://example.org/library', highlights: ['Opening hours vary by day.'] }] });
+
+describe('OpenAI assistant safety and orchestration', () => {
+  it('uses the requested configurable default model', () => { expect(DEFAULT_OPENAI_MODEL).toBe('gpt-6-luna'); });
+  it('executes Exa tools and delivers an evidence-grounded answer', async () => {
+    let models = 0;
+    const fetcher = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+      if (String(url).includes('exa.ai')) return searchResponse();
+      const body = JSON.parse(String(init?.body));
+      expect(body.model).toBe('gpt-6-luna');
+      if (models++ === 0) return toolResponse('first');
+      expect(body.input[0].type).toBe('function_call_output');
+      expect(JSON.parse(body.input[0].output).sources[0].number).toBe(1);
+      return answerResponse();
+    }) as unknown as typeof fetch;
+    let result = await runAgentStep({ message: 'Help me check library hours in Helsinki.' }, config, fetcher);
+    const stages = [result.stage];
+    while (!result.done) { result = await runAgentStep({ state: result.state }, config, fetcher); stages.push(result.stage); }
+    expect(result.answer).toContain('[1]'); expect(result.sources[0]?.url).toBe('https://example.org/library');
+    expect(stages).toContain('Searching for information'); expect(stages).toContain('Reading sources'); expect(stages).toContain('Preparing your answer');
+  });
+  it('enforces at most three searches across follow-ups in the same task', async () => {
+    let searches = 0;
+    const fetcher = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+      if (String(url).includes('exa.ai')) { searches++; return searchResponse(); }
+      const body = JSON.parse(String(init?.body));
+      return body.tool_choice === 'none' ? answerResponse() : toolResponse(`model-${searches}`);
+    }) as unknown as typeof fetch;
+    let result: AgentReply = await runAgentStep({ message: 'Research libraries.' }, config, fetcher);
+    while (!result.done) result = await runAgentStep({ state: result.state }, config, fetcher);
+    expect(searches).toBe(3);
+    result = await runAgentStep({ state: result.state, message: 'Compare those sources again.' }, config, fetcher);
+    while (!result.done) result = await runAgentStep({ state: result.state }, config, fetcher);
+    expect(searches).toBe(3);
+  });
+  it('limits each tool output to five results', async () => {
+    let calls = 0;
+    const fetcher = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
+      if (String(url).includes('exa.ai')) return Response.json({ results: Array.from({ length: 9 }, (_, i) => ({ title: `${i}`, url: `https://example.org/${i}`, highlights: ['Evidence'] })) });
+      if (calls++ === 0) return toolResponse('first');
+      const output = JSON.parse(JSON.parse(String(init?.body)).input[0].output);
+      expect(output.sources).toHaveLength(5); return answerResponse();
+    }) as unknown as typeof fetch;
+    let result = await runAgentStep({ message: 'Research libraries.' }, config, fetcher);
+    while (!result.done) result = await runAgentStep({ state: result.state }, config, fetcher);
+    expect(result.sources).toHaveLength(5);
+  });
+  it('stops infinite tool-calling without making unlimited API requests', async () => {
+    const fetcher = vi.fn(async () => Response.json({ id: 'repeat', output: [{ type: 'function_call', name: 'unknown', call_id: 'call', arguments: '{}' }] })) as unknown as typeof fetch;
+    let result = await runAgentStep({ message: 'Help.' }, config, fetcher);
+    let steps = 0;
+    while (!result.done && steps++ < 20) result = await runAgentStep({ state: result.state }, config, fetcher);
+    expect(result.error).toContain('safety limit'); expect(steps).toBeLessThanOrEqual(13);
+  });
+  it('does not fall back to fabricated answers after an Exa failure', async () => {
+    const fetcher = vi.fn(async (url: string | URL | Request) => String(url).includes('exa.ai') ? new Response('', { status: 503 }) : toolResponse('first')) as unknown as typeof fetch;
+    let result = await runAgentStep({ message: 'Research libraries.' }, config, fetcher);
+    while (!result.done) result = await runAgentStep({ state: result.state }, config, fetcher);
+    expect(result.answer).toBeUndefined(); expect(result.sources).toEqual([]); expect(result.error).toContain('unavailable');
+  });
+  it('rejects tampered continuation state without executing tools', async () => {
+    const fetcher = vi.fn();
+    const result = await runAgentStep({ state: 'forged-token', message: 'Reset searches.' }, config, fetcher);
+    expect(result.error).toBeDefined(); expect(fetcher).not.toHaveBeenCalled();
+  });
+  it('omits invented URLs and references to nonexistent sources', () => {
+    expect(groundedText('See https://invented.example/path [9]', [])).toBe('See (unverified link omitted) (source unavailable)');
+  });
+});
