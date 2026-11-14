@@ -8,8 +8,6 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
   const [tasks, setTasks] = useState(sampleTasks);
   const [showSuggestions, setShowSuggestions] = useState(true);
   const step = useServerFn(agentStep);
-  const taskRecords = useRef(tasks);
-  taskRecords.current = tasks;
   const states = useRef(new Map<string, string>());
   const activeRequests = useRef(new Set<string>());
   const addTask = (text: string) => {
