@@ -8,6 +8,7 @@ export interface TaskContextValue {
   updateDraft: (id: string, text: string) => void;
   sendMessage: (id: string, text: string) => void;
   advanceTask: (id: string) => void;
+  researchTask: (id: string, query: string) => Promise<void>;
   showSuggestions: boolean;
   setShowSuggestions: (value: boolean) => void;
 }
