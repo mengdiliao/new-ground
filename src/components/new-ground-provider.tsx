@@ -66,7 +66,8 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
           searchState: result.done ? result.error ? 'error' : 'success' : 'loading', searchError: result.error,
           ...(result.answer && !result.emailAction && !result.calendarAction && !emailRewrite ? { messages: [...task.messages, { id: crypto.randomUUID(), role: 'assistant' as const, text: result.answer, images: selectedImages(enrichedSources, result.imageSourceNumbers ?? []) }], results: result.clarification ? undefined : { summary: result.answer, options: [], steps: answerActions(result.answer) } } : {}) }));
         if (result.done && result.calendarAction) {
-          updateTask(id, task => applyCalendarAction(task, { ...result.calendarAction as import('@/lib/calendar-draft').CalendarContent, id: calendarDraft?.id ?? crypto.randomUUID() }));
+          const content = result.calendarAction;
+          updateTask(id, task => applyCalendarAction(task, { ...content, id: calendarDraft?.id ?? crypto.randomUUID() }));
           if (result.clarification && result.answer) updateTask(id, task => ({ ...task, messages: [...task.messages, { id: crypto.randomUUID(), role: 'assistant', text: result.answer ?? '' }] }));
         }
         if (result.done && result.emailAction) {
