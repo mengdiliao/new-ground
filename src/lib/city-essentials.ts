@@ -3,11 +3,12 @@ import type { MoveProfile } from './profile';
 import { moveContext } from './profile';
 import type { Source } from './task-data';
 import { cleanHighlight } from './exa-search';
+import { researchImageSchema } from './research-images';
 
 export const categories = ['moving-requirements', 'find-your-people', 'emergency-essentials', 'arrival-checklist'] as const;
 export type EssentialCategory = typeof categories[number];
 export const ESSENTIALS_STORAGE_KEY = 'new-ground.city-essentials.v1';
-const sourceSchema = z.object({ title: z.string(), url: z.string().url().refine(value => /^https?:\/\//.test(value)), domain: z.string(), highlights: z.array(z.string()), preview: z.string(), publishedDate: z.string().nullable() });
+const sourceSchema = z.object({ title: z.string(), url: z.string().url().refine(value => /^https?:\/\//.test(value)), domain: z.string(), highlights: z.array(z.string()), preview: z.string(), publishedDate: z.string().nullable(), images: z.array(researchImageSchema).max(3).optional() });
 export const researchedItemSchema = z.object({ title: z.string().min(1).max(100), shortSummary: z.string().min(1).max(450), detailedExplanation: z.string().min(1).max(2200), applicabilityStatus: z.enum(['source-supported', 'conditional', 'needs-information']), qualification: z.string().max(600), question: z.string().max(300), actionable: z.boolean(), interest: z.enum(['general', 'sports', 'language', 'volunteering', 'creative', 'professional']), contactNumber: z.string().max(40).nullable(), region: z.string().max(160), sourceNumbers: z.array(z.number().int().positive()).min(1).max(5) });
 export const researchItemsSchema = z.object({ items: z.array(researchedItemSchema).max(6) });
 export const essentialItemSchema = researchedItemSchema.omit({ sourceNumbers: true }).extend({ id: z.string(), featureCategory: z.enum(categories), destinationId: z.number(), associatedMoveId: z.string(), researchedAt: z.string().datetime(), sourceReferences: z.array(sourceSchema).min(1).max(5) });

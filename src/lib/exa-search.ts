@@ -1,10 +1,11 @@
 import { z } from 'zod';
+import { imageCandidates, type ResearchImage } from './research-images';
 
-export interface SearchSource { title: string; url: string; domain: string; highlights: string[]; publishedDate: string | null; preview: string; }
+export interface SearchSource { title: string; url: string; domain: string; highlights: string[]; publishedDate: string | null; preview: string; images?: ResearchImage[] | undefined; }
 export type SearchOutcome = { ok: true; sources: SearchSource[] } | { ok: false; error: 'configuration' | 'credentials' | 'rate_limit' | 'timeout' | 'network' | 'invalid_response' | 'unavailable'; message: string };
 export const searchInput = z.object({ query: z.string().trim().min(1).max(2000) });
-export function exaRequest(query: string) { return { query, type: 'auto', numResults: 5, contents: { highlights: true } }; }
-const responseSchema = z.object({ results: z.array(z.object({ title: z.string().nullish(), url: z.string(), highlights: z.array(z.string()).nullish(), publishedDate: z.string().nullish() })) });
+export function exaRequest(query: string) { return { query, type: 'auto', numResults: 5, contents: { highlights: true, extras: { imageLinks: 2, richImageLinks: 4 } } }; }
+const responseSchema = z.object({ results: z.array(z.object({ title: z.string().nullish(), url: z.string(), highlights: z.array(z.string()).nullish(), publishedDate: z.string().nullish(), image: z.string().nullish(), extras: z.object({ imageLinks: z.array(z.string()).nullish(), richImageLinks: z.array(z.object({ url: z.string(), alt: z.string().optional() })).nullish() }).nullish() })) });
 const HIGHLIGHT_LIMIT = 280;
 export function cleanHighlight(text: string): string {
   const plain = text
@@ -26,7 +27,8 @@ export function normalizeExaResponse(input: unknown): SearchSource[] {
     let url: URL; try { url = new URL(result.url); } catch { return []; }
     if (!['https:', 'http:'].includes(url.protocol)) return [];
     const highlights = (result.highlights ?? []).map(cleanHighlight).filter(Boolean);
-    return [{ title: result.title?.trim() || url.hostname, url: url.href, domain: url.hostname.replace(/^www\./, ''), highlights, preview: highlights.join('\n\n'), publishedDate: result.publishedDate && Number.isFinite(Date.parse(result.publishedDate)) ? result.publishedDate : null }];
+    const images = imageCandidates(result);
+    return [{ title: result.title?.trim() || url.hostname, url: url.href, domain: url.hostname.replace(/^www\./, ''), highlights, preview: highlights.join('\n\n'), publishedDate: result.publishedDate && Number.isFinite(Date.parse(result.publishedDate)) ? result.publishedDate : null, ...(images.length ? { images } : {}) }];
   }).slice(0, 5);
 }
 export function searchFailure(error: Extract<SearchOutcome, { ok: false }>['error']): SearchOutcome {
