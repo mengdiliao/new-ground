@@ -12,3 +12,9 @@
 - [x] Add dedicated task workspaces and per-task conversation, progress, research, and result state.
 - [x] Connect submission, keyboard controls, new tasks, and task switching.
 - [x] Test demo honesty, state isolation, and desktop/mobile flows.
+
+## Live Exa search
+- [ ] Enable Lovable Cloud and collect EXA_API_KEY securely.
+- [ ] Add server-side Exa search, validated results, and safe failure handling.
+- [ ] Connect genuine loading and source results without changing visual design.
+- [ ] Verify live search and add a test using an actual Exa response.
