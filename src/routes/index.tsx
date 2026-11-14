@@ -4,7 +4,7 @@ import { ArrowRight, Sparkles, HeartHandshake, Scale, Files, Map, LockKeyhole, S
 import { Button } from '@/components/ui/button';
 import { useNewGround } from '@/components/new-ground-provider';
 import { TaskCard, categoryStyles } from '@/components/task-card';
-import neighborhood from '@/assets/neighborhood.jpg';
+import neighborhood from '@/assets/neighborhood-refined.png';
 
 export const Route = createFileRoute('/')({
   head: () => ({ meta: [{ title: 'New Ground — A little help goes a long way' }, { name: 'description', content: 'Turn everyday overwhelm into a clear next step. Less searching. More living.' }, { property: 'og:title', content: 'New Ground — A little help goes a long way' }, { property: 'og:description', content: 'A thoughtful place to find clarity for everyday tasks.' }, { property: 'og:type', content: 'website' }, { name: 'twitter:card', content: 'summary_large_image' }] }),
