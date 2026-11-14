@@ -20,7 +20,7 @@ export function calendarRange(draft: CalendarContent) {
   const format = (value: Temporal.Instant) => value.toString({ smallestUnit: 'second' }).replaceAll('-', '').replaceAll(':', '');
   return { start: format(first), end: format(last) };
 }
-export function calendarError(draft: CalendarContent) { if (!draft.title.trim()) return 'Add an event title.'; try { calendarRange(draft); return ''; } catch (error) { return error instanceof Error ? error.message : 'Check the event dates and times.'; } }
+export function calendarError(draft: CalendarContent) { if (!draft.title.trim()) return 'Add an event title.'; if (draft.sourceUrl && !/^https?:\/\/[^\s\r\n]+$/.test(draft.sourceUrl)) return 'Enter a valid source URL.'; try { calendarRange(draft); return ''; } catch (error) { return error instanceof Error ? error.message : 'Check the event dates and times.'; } }
 export function calendarDescription(draft: CalendarContent) { return [draft.description, draft.sourceUrl ? `Source: ${draft.sourceUrl}` : '', `Event: ${draft.status === 'confirmed' ? 'Confirmed appointment' : draft.status === 'reminder' ? 'Reminder' : 'Tentative plan'}`, draft.timeZone ? `Time zone: ${draft.timeZone}` : '', draft.endSuggested ? 'End time is an editable suggestion, not a confirmed detail.' : '', draft.reminderMinutes !== null ? `Reminder preference: ${draft.reminderMinutes} minutes before (review in your calendar).` : ''].filter(Boolean).join('\n\n'); }
 export function googleCalendarUrl(draft: CalendarContent) { if (calendarError(draft)) return null; const range = calendarRange(draft); const url = new URL('https://calendar.google.com/calendar/render'); url.search = new URLSearchParams({ action: 'TEMPLATE', text: draft.title, dates: `${range.start}/${range.end}`, ctz: draft.timeZone || 'UTC', location: draft.location, details: calendarDescription(draft) }).toString(); return url.href.length <= 8000 ? url.href : null; }
 const escapeText = (text: string) => text.replace(/\\/g, '\\\\').replace(/\r\n|\r|\n/g, '\\n').replace(/;/g, '\\;').replace(/,/g, '\\,');
@@ -35,7 +35,7 @@ export function calendarIcs(draft: CalendarDraft, now = new Date()) {
   lines.push('END:VEVENT', 'END:VCALENDAR'); return lines.map(fold).join('\r\n') + '\r\n';
 }
 export function safeCalendar(content: CalendarContent, userText: string, sources: Source[], existing?: CalendarDraft | null): CalendarContent {
-  const confirmed = /\b(?:confirmed|booked|confirmation)\b/i.test(userText) || existing?.status === 'confirmed';
+  const confirmed = /\b(?:I have (?:a )?confirmed|my (?:appointment|booking|meeting) (?:is|was) confirmed|I (?:have )?booked|booking confirmation received)\b/i.test(userText) || existing?.status === 'confirmed';
   return { ...content, status: content.eventType === 'Reminder' ? 'reminder' : content.status === 'confirmed' && !confirmed ? 'tentative' : content.status, sourceUrl: sources.some(source => source.url === content.sourceUrl) || existing?.sourceUrl === content.sourceUrl ? content.sourceUrl : '' };
 }
 export function applyCalendarAction(task: Task, draft: CalendarDraft): Task { const exists = task.messages.some(message => message.calendarDraft?.id === draft.id); return { ...task, messages: exists ? task.messages.map(message => message.calendarDraft?.id === draft.id ? { ...message, calendarDraft: draft } : message) : [...task.messages, { id: draft.id, role: 'assistant', text: '', calendarDraft: draft }] }; }
