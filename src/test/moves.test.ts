@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { emptyProfile, emptyMoveStore, putMove, activateMove, moveContext, moveRevision } from '@/lib/profile';
 import { loadMoveStore, saveMoveStore, PROFILE_STORAGE_KEY } from '@/lib/profile-storage';
-import { createDraftTask } from '@/lib/task-data';
+import { createDraftTask, appendMessage } from '@/lib/task-data';
 import { saveTasks, loadTasks } from '@/lib/task-storage';
 import { runAgentStep } from '@/lib/agent.server';
 const destination = { cityId: 658225, cityName: 'Helsinki', countryCode: 'FI', countryName: 'Finland' };
@@ -9,6 +9,7 @@ const now = '2026-11-14T20:56:00.000Z';
 const first = () => putMove(emptyMoveStore, { ...emptyProfile, destination }, 'first', now);
 function memory() { const data = new Map<string, string>(); return { getItem: (key: string) => data.get(key) ?? null, setItem: (key: string, value: string) => { data.set(key, value); } }; }
 describe('Persistent moves', () => {
+  it('keeps a blank task bound to its original move when the first message arrives', () => { const task = appendMessage({ ...createDraftTask('draft'), moveId: 'first' }, 'My first question'); expect(task.moveId).toBe('first'); expect(task.messages[0]?.text).toBe('My first question'); });
   it('starts without a preset active move', () => { expect(loadMoveStore(memory())).toEqual({ version: 2, moves: [], activeMoveId: null }); });
   it('preserves unknown optional values on save and reload', () => { const storage = memory(); saveMoveStore(storage, first()); expect(loadMoveStore(storage).moves[0]).toMatchObject({ id: 'first', destination, origin: null, arrival: null, duration: null, purpose: null, confirmedDetails: {} }); });
   it('migrates the existing profile in the same storage key', () => { const storage = memory(); storage.setItem(PROFILE_STORAGE_KEY, JSON.stringify({ ...emptyProfile, destination })); const store = loadMoveStore(storage); saveMoveStore(storage, store); expect(loadMoveStore(storage).activeMoveId).toBe('legacy-move'); expect(loadMoveStore(storage).moves).toHaveLength(1); });

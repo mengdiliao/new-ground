@@ -22,7 +22,7 @@ export function createLocalTask(text: string, id: string): Task | undefined {
 }
 export function appendMessage(task: Task, text: string): Task {
   if (!text.trim()) return task;
-  if (!task.description) return createLocalTask(text, task.id) ?? task;
+  if (!task.description) { const created = createLocalTask(text, task.id); return created ? { ...task, ...created, moveId: task.moveId, moveRevision: task.moveRevision, moveSnapshot: task.moveSnapshot } : task; }
   if (!task.demo) return { ...task, draft: '', messages: [...task.messages, { id: `${task.id}-${task.messages.length}`, role: 'user', text }] };
   return { ...task, draft: '', messages: [...task.messages, { id: `${task.id}-${task.messages.length}`, role: 'user', text }, { id: `${task.id}-${task.messages.length + 1}`, role: 'assistant', text: 'I’ve added that context to this demo conversation. Keep your priorities, constraints, and timeline in mind as you review the example plan. No live research has been performed.' }] };
 }

@@ -1,9 +1,9 @@
 # New Ground frontend
 ## Persistent Move Setup
-- [ ] Reuse device-local profile storage for multiple moves, migration, editing, switching, and confirmed details.
-- [ ] Replace the homepage form with saved-move summary and shared setup controls.
-- [ ] Bind tasks and agent context to their move; flag changed research and offer a separate refresh.
-- [ ] Verify persistence, isolation, updated agent/Exa context, and the live research flow.
+- [x] Reuse device-local profile storage for multiple moves, migration, editing, switching, and confirmed details.
+- [x] Replace the homepage form with saved-move summary and shared setup controls.
+- [x] Bind tasks and agent context to their move; flag changed research and offer a separate refresh.
+- [x] Verify persistence, isolation, updated agent/Exa context, and the live research flow.
 ## Feature discovery
 - [x] Replace the homepage category grid with a four-card feature discovery section (illustrated, two-column grid).
 - [x] Move "Your Move" directly below the hero as a compact journey card with inline pickers and swap.
