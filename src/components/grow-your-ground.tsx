@@ -58,7 +58,7 @@ export function GrowYourGround() {
       </g>}
     </svg>
     <div className="flex h-8 items-center justify-center" aria-live="polite">
-      {stage < 4 ? <Button variant="outline" size="sm" disabled={!ready} onClick={water}><Droplet />Water</Button> : <span className="text-xs font-medium text-sage-foreground">Fully rooted 🌱</span>}
+      {stage < 4 ? <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" aria-label="Water plant" title="Water plant" disabled={!ready} onClick={water}><Droplet aria-hidden="true" /></Button> : <span className="font-plant-message text-sm font-semibold text-sage-foreground">Rooting for you! 🌱</span>}
     </div>
     {storageError && <p role="status" className="mt-2 text-xs text-muted-foreground">Growth can’t be saved on this device.</p>}
   </section>;

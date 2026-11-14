@@ -32,6 +32,7 @@
 @theme inline {
   --font-sans: "DM Sans", sans-serif;
   --font-display: "DM Sans", sans-serif;
+  --font-plant-message: "Nunito", "DM Sans", sans-serif;
   --color-brand-blue: var(--brand-blue);
   --color-brand-mint: var(--brand-mint);
   --color-brand-sage: var(--brand-sage);
