@@ -347,3 +347,6 @@ svg { stroke-linecap: round; stroke-linejoin: round; }
   .feature-hero-art img { max-width: 180px; }
   .feature-hero-title { font-size: 32px; }
 }
+
+.move-fact-input { margin-top: 4px; width: 100%; height: 34px; border-radius: 10px; border: 1px solid var(--input); background: var(--background); padding: 0 8px; font-size: 14px; font-weight: 500; color: var(--foreground); outline: none; }
+.move-fact-input:focus-visible { box-shadow: 0 0 0 2px var(--ring); }
