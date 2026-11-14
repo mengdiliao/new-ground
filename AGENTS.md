@@ -52,3 +52,4 @@ use the editor.
 - Keep email actions as typed session-only conversation cards using the existing agent; validate recipient evidence and handoff URLs, preserve manual edits in revisions, and never mutate task status or claim sending.
 
 - Keep calendar drafts session-only and separate from task progress; resolve destination zones from GeoNames coordinates, use Temporal for DST-safe UTC exports, and provide reusable prepare-only actions with explicit external handoffs.
+- Attach at most one optional, recent-history-deduplicated suggestion to each answer; clicks reuse existing draft handlers and tracked-task conversion requires explicit confirmation.
