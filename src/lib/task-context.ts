@@ -1,10 +1,10 @@
 import { createContext, useContext, type Context } from 'react';
-import type { Task, TaskStatus, ConversationType } from '@/lib/task-data';
+import type { Task, TaskStatus, ConversationType, Source } from '@/lib/task-data';
 
 export interface TaskContextValue {
   tasks: Task[];
   allTasks: Task[];
-  addTask: (text: string, type?: ConversationType) => Task | undefined;
+  addTask: (text: string, type?: ConversationType, sources?: Source[]) => Task | undefined;
   newTask: (type?: ConversationType) => Task;
   updateDraft: (id: string, text: string) => void;
   sendMessage: (id: string, text: string) => void;

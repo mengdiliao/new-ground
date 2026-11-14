@@ -358,4 +358,18 @@ svg { stroke-linecap: round; stroke-linejoin: round; }
 .move-fact-input { margin-top: 4px; width: 100%; height: 34px; border-radius: 10px; border: 1px solid var(--input); background: var(--background); padding: 0 8px; font-size: 14px; font-weight: 500; color: var(--foreground); outline: none; }
 .move-fact-input:focus-visible { box-shadow: 0 0 0 2px var(--ring); }
 
+.essential-hub { flex-direction: column; gap: 12px; min-width: 0; box-shadow: var(--shadow-card); }
+.essential-hub-heading { display: flex; gap: 16px; align-items: center; }
+.essential-hub .feature-illustration { width: 92px; height: 104px; background: transparent; }
+.essential-hub .feature-illustration img { object-fit: contain; }
+.essential-hub .feature-title { margin-top: 6px; }
+.essential-row { display: flex; align-items: start; gap: 12px; width: 100%; height: auto; min-height: 84px; padding: 14px 0; white-space: normal; text-align: left; border-radius: 0; border-bottom: 1px solid var(--border); overflow-wrap: anywhere; }
+.essential-row:hover { background: var(--muted); }
+.essential-row > svg { margin-top: 3px; }
+.research-image-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.research-image-button { position: relative; width: 100%; height: auto; aspect-ratio: 3 / 2; padding: 0; overflow: hidden; border-radius: 12px; background: var(--muted); }
+.research-image-button img { width: 100%; height: 100%; object-fit: cover; }
+.essential-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+@media (max-width: 767px) { .essential-list { grid-template-columns: 1fr; } .essential-hub .feature-illustration { width: 76px; height: 92px; } }
+
 @media (min-width: 768px) and (max-width: 1100px) { .task-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

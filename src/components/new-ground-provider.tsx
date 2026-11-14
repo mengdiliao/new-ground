@@ -2,12 +2,13 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useServerFn } from '@tanstack/react-start';
 import { agentStep } from '@/lib/agent.functions';
 import { MAX_AGENT_STEPS } from '@/lib/agent';
-import { createLocalTask, createDraftTask, appendMessage, advanceDemo, type Task, type ConversationType } from '@/lib/task-data';
+import { createLocalTask, createDraftTask, appendMessage, advanceDemo, type Task, type ConversationType, type Source } from '@/lib/task-data';
 import { TaskContext } from '@/lib/task-context';
 import { loadTasks, saveTasks } from '@/lib/task-storage';
 import { renameTask, toggleAction, answerActions, convertToTask, changeTaskStatus, updateTaskNotes } from '@/lib/task-history';
 import { useProfile } from '@/lib/profile-context';
 import { moveContext, moveRevision } from '@/lib/profile';
+import { selectedImages, compactSourceImages } from '@/lib/research-images';
 export function NewGroundProvider({ children }: { children: ReactNode }) {
   const { activeMove, moves } = useProfile();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -32,9 +33,9 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
   const activeRequests = useRef(new Set<string>());
   const taskMoves = useRef(new Map<string, Task>());
   const bindMove = (task: Task): Task => ({ ...task, moveId: activeMove?.id ?? null, moveRevision: activeMove ? moveRevision(activeMove) : undefined, moveSnapshot: activeMove ? moveContext(activeMove) : null });
-  const addTask = (text: string, type: ConversationType = 'query') => {
+  const addTask = (text: string, type: ConversationType = 'query', sources: Source[] = []) => {
     const created = createLocalTask(text, crypto.randomUUID(), type);
-    const task = created ? bindMove(created) : undefined;
+    const task = created ? bindMove({ ...created, sources }) : undefined;
     if (task) { taskMoves.current.set(task.id, task); setTasks(current => [task, ...current]); }
     return task;
   };
@@ -45,6 +46,7 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
     updateTask(id, task => ({ ...task, demo: false, agentStage: 'Understanding your request', searchState: 'loading', searchError: undefined, results: undefined }));
     try {
       let state = states.current.get(id);
+      const imageSources = new Map<string, Source>();
       const existing = tasksRef.current.find(task => task.id === id) ?? taskMoves.current.get(id);
       const move = moves.find(move => move.id === existing?.moveId);
       const context = move ? moveContext(move) : existing?.moveSnapshot ?? null;
@@ -54,9 +56,11 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
       for (let index = 0; index <= MAX_AGENT_STEPS + 1; index++) {
         const result = await step({ data: index === 0 ? { state, message: query, move: context, ...(!state ? { history } : {}) } : { state } });
         if (result.state) { state = result.state; states.current.set(id, state); }
-        updateTask(id, task => ({ ...task, agentState: state, agentStage: result.stage ?? task.agentStage, researchPlan: result.plan ?? task.researchPlan, sources: result.sources.length ? result.sources : task.sources, searchRounds: result.rounds,
+        for (const source of await compactSourceImages(result.sources)) if (source.images?.some(image => image.dataUrl)) imageSources.set(source.url, source);
+        const enrichedSources = result.sources.map(source => imageSources.get(source.url) ?? source);
+        updateTask(id, task => ({ ...task, agentState: state, agentStage: result.stage ?? task.agentStage, researchPlan: result.plan ?? task.researchPlan, sources: enrichedSources.length ? enrichedSources : task.sources, searchRounds: result.rounds,
           searchState: result.done ? result.error ? 'error' : 'success' : 'loading', searchError: result.error,
-          ...(result.answer ? { messages: [...task.messages, { id: crypto.randomUUID(), role: 'assistant' as const, text: result.answer }], results: result.clarification ? undefined : { summary: result.answer, options: [], steps: answerActions(result.answer) } } : {}) }));
+          ...(result.answer ? { messages: [...task.messages, { id: crypto.randomUUID(), role: 'assistant' as const, text: result.answer, images: selectedImages(enrichedSources, result.imageSourceNumbers ?? []) }], results: result.clarification ? undefined : { summary: result.answer, options: [], steps: answerActions(result.answer) } } : {}) }));
         if (result.done) return;
         if (!state) throw new Error('Missing continuation');
       }

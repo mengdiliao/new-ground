@@ -4,7 +4,7 @@ import { cleanHighlight, exaRequest, normalizeExaResponse, searchInput } from '@
 import { requestExa } from '@/lib/exa-search.server';
 
 describe('Exa search contract', () => {
-  it('uses auto search, five results, and highlights', () => { expect(exaRequest('moving to Helsinki')).toEqual({ query: 'moving to Helsinki', type: 'auto', numResults: 5, contents: { highlights: true } }); });
+  it('uses auto search, five results, highlights and bounded image metadata', () => { expect(exaRequest('moving to Helsinki')).toEqual({ query: 'moving to Helsinki', type: 'auto', numResults: 5, contents: { highlights: true, extras: { imageLinks: 2, richImageLinks: 4 } } }); });
   it('normalizes a genuine Exa response captured on November 14, 2026', () => {
     const sources = normalizeExaResponse(actualResponse);
     expect(sources).toHaveLength(5);

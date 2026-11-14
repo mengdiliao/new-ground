@@ -1,6 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import { ArrowRight, ClipboardList, Scale, Shield, Users } from 'lucide-react';
 import type { Feature } from '@/lib/features';
+import { Button } from '@/components/ui/button';
+import { CityEssentialItems } from '@/components/city-essential-items';
+import type { EssentialCategory } from '@/lib/city-essentials';
 
 const icons = { scale: Scale, users: Users, shield: Shield, checklist: ClipboardList } as const;
 
@@ -9,7 +12,8 @@ const icons = { scale: Scale, users: Users, shield: Shield, checklist: Clipboard
 export function FeatureCard({ feature }: { feature: Feature }) {
   const Icon = icons[feature.icon];
   return (
-    <Link to="/features/$featureId" params={{ featureId: feature.slug }} className="feature-card control control-card group" aria-label={`${feature.title} — ${feature.description}`}>
+    <article className="feature-card essential-hub" aria-label={feature.title}>
+      <div className="essential-hub-heading">
       <div className="feature-illustration" aria-hidden="true">
         <img src={feature.image} alt="" loading="lazy" width={816} height={816} />
       </div>
@@ -17,8 +21,10 @@ export function FeatureCard({ feature }: { feature: Feature }) {
         <span className="feature-icon"><Icon size={16} /></span>
         <h3 className="feature-title">{feature.title}</h3>
         <p className="feature-description">{feature.description}</p>
-        <span className="feature-cta">Explore<ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" /></span>
       </div>
-    </Link>
+      </div>
+      <CityEssentialItems category={feature.slug as EssentialCategory} compact />
+      <Button asChild variant="link" className="mt-auto h-auto justify-start px-0 pt-4 text-xs"><Link to="/features/$featureId" params={{ featureId: feature.slug }}>View all<ArrowRight size={14} /></Link></Button>
+    </article>
   );
 }
