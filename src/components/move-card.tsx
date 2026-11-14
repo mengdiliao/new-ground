@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { LocationPicker } from '@/components/location-picker';
 import { useProfile } from '@/lib/profile-context';
 import { useNewGround } from '@/lib/task-context';
-import { arrivalLabel, durationLabel, hasDestination, swapLocations } from '@/lib/profile';
+import { arrivalLabel, durationChoices, durationLabel, durationLabels, type DurationChoice, hasDestination, swapLocations } from '@/lib/profile';
 import { locationLabel } from '@/lib/locations';
 
 // Compact travel-inspired journey card: inline From/To pickers with a swap
@@ -50,8 +50,16 @@ export function MoveCard() {
         <LocationPicker id="move-destination" label="Moving to" value={profile.destination} onSelect={location => saveProfile({ ...profile, destination: location })} placeholder="Where to?" />
       </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        <div className="move-fact"><dt className="move-fact-label flex items-center gap-1"><CalendarDays size={11} />Arrival</dt><dd className="move-fact-value">{arrivalLabel(profile)}</dd></div>
-        <div className="move-fact"><dt className="move-fact-label flex items-center gap-1"><Hourglass size={11} />Duration</dt><dd className="move-fact-value">{durationLabel(profile)}</dd></div>
+        <div className="move-fact"><label htmlFor="move-arrival" className="move-fact-label flex items-center gap-1"><CalendarDays size={11} />Arrival</label>
+          <input id="move-arrival" type="date" value={profile.arrival?.kind === 'exact' ? profile.arrival.date : ''} onChange={event => saveProfile({ ...profile, arrival: event.target.value ? { kind: 'exact', date: event.target.value } : null })} className="move-fact-input" />
+          {profile.arrival && profile.arrival.kind !== 'exact' && <p className="mt-1 text-xs text-muted-foreground">{arrivalLabel(profile)}</p>}
+        </div>
+        <div className="move-fact"><label htmlFor="move-duration" className="move-fact-label flex items-center gap-1"><Hourglass size={11} />Duration</label>
+          <select id="move-duration" value={profile.duration?.choice ?? ''} onChange={event => { const choice = event.target.value as DurationChoice | ''; saveProfile({ ...profile, duration: choice ? (choice === 'custom' ? { choice, custom: profile.duration?.custom } : { choice }) : null }); }} className="move-fact-input">
+            <option value="">Duration not set</option>
+            {durationChoices.filter(c => c !== 'custom' || profile.duration?.choice === 'custom').map(c => <option key={c} value={c}>{c === 'custom' ? durationLabel(profile) : durationLabels[c]}</option>)}
+          </select>
+        </div>
       </div>
       {hasDestination(profile)
         ? <Button onClick={researchMove} className="mt-4 h-10"><Sparkles size={15} />Research my move<ArrowRight size={14} /></Button>
