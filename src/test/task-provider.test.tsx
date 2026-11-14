@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, cleanup } from '@testing-library/react';
+import { fireEvent, render, screen, cleanup, act } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
 const { request } = vi.hoisted(() => ({ request: vi.fn(async (_input: unknown) => ({ done: true, sources: [], rounds: 0 })) }));
 vi.mock('@tanstack/react-start', () => ({ useServerFn: () => request }));
@@ -34,7 +34,7 @@ it('saving does not research; new tasks use confirmed context and remain separat
   fireEvent.click(screen.getByText('Save move'));
   expect(request).not.toHaveBeenCalled();
   fireEvent.click(screen.getByText('Confirm interests'));
-  fireEvent.click(screen.getByText('Research'));
+  await act(async () => { fireEvent.click(screen.getByText('Research')); });
   expect(request.mock.calls[0]?.[0]).toMatchObject({ data: { move: { destination: { city: 'Helsinki', country: 'Finland' }, origin: null, confirmedDetails: { interests: 'Cycling' } } } });
   fireEvent.click(screen.getByText('Save move'));
   expect(screen.getByLabelText('Move task count')).toHaveTextContent('0');
