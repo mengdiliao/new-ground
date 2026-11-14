@@ -33,7 +33,8 @@ export async function runAgentStep(input: AgentInput, config: Config, fetcher: t
   if (input.message) {
     if (state.pending.length) return reply({ done: true, error: 'Research is still in progress. Please wait before sending another message.' });
     state.phase = 'model'; state.steps = 0; state.answer = undefined;
-    state.input = [...state.input.filter(item => typeof item === 'object' && item !== null && 'type' in item && item.type === 'function_call_output'), { role: 'user', content: input.message }];
+    const history = !input.state ? (input.history ?? []).map(message => ({ role: message.role, content: message.text })) : [];
+    state.input = [...history, ...state.input.filter(item => typeof item === 'object' && item !== null && 'type' in item && item.type === 'function_call_output'), { role: 'user', content: input.message }];
     return reply({ stage: 'Understanding your request' });
   }
   if (++state.steps > MAX_AGENT_STEPS) return reply({ done: true, error: 'Research stopped at its safety limit. Try a more focused follow-up.' });

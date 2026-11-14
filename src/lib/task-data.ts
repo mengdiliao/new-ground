@@ -3,7 +3,7 @@ export type TaskStatus = typeof taskStages[number];
 export interface Message { id: string; role: 'user' | 'assistant'; text: string; }
 export interface Source { title: string; preview: string; url: string; domain?: string; highlights?: string[]; publishedDate?: string | null; }
 export interface Results { summary: string; options: string[]; steps: string[]; }
-export interface Task { id: string; title: string; description: string; status: TaskStatus; category: 'support' | 'compare' | 'process' | 'plan'; demo: boolean; messages: Message[]; draft: string; sources: Source[]; results?: Results | undefined; searchState?: 'idle' | 'loading' | 'success' | 'error'; searchError?: string | undefined; agentState?: string | undefined; agentStage?: import('./agent').AgentStage | undefined; searchRounds?: number; researchPlan?: string | undefined; }
+export interface Task { id: string; title: string; description: string; status: TaskStatus; category: 'support' | 'compare' | 'process' | 'plan'; demo: boolean; messages: Message[]; draft: string; sources: Source[]; results?: Results | undefined; searchState?: 'idle' | 'loading' | 'success' | 'error'; searchError?: string | undefined; agentState?: string | undefined; agentStage?: import('./agent').AgentStage | undefined; searchRounds?: number; researchPlan?: string | undefined; createdAt?: string; updatedAt?: string; completedActions?: string[]; }
 const samples: Omit<Task, 'messages' | 'draft' | 'sources' | 'results'>[] = [
   { id: 'moving', title: 'A fresh start in a new city', description: 'Getting the essentials sorted for my upcoming move.', status: 'Planning', category: 'plan', demo: true },
   { id: 'insurance', title: 'Find the right health insurance', description: 'Comparing coverage, costs, and what matters to me.', status: 'Researching', category: 'compare', demo: true },
@@ -14,7 +14,7 @@ export const sampleTasks: Task[] = samples.map(task => {
   while (workspace.status !== task.status) workspace = advanceDemo(workspace);
   return workspace;
 });
-export function createDraftTask(id: string): Task { return { id, title: 'Untitled task', description: '', status: 'Planning', category: 'plan', demo: false, messages: [], draft: '', sources: [] }; }
+export function createDraftTask(id: string): Task { const now = new Date().toISOString(); return { id, title: 'Untitled task', description: '', status: 'Planning', category: 'plan', demo: false, messages: [], draft: '', sources: [], createdAt: now, updatedAt: now, completedActions: [] }; }
 export function createLocalTask(text: string, id: string): Task | undefined {
   const description = text.trim();
   if (!description) return undefined;
