@@ -11,9 +11,9 @@ function migrateConversation(value: unknown): unknown {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return value;
   const record = value as Record<string, unknown>;
   // Old processing stages are not evidence of a user-confirmed task.
-  const type = record.type === 'task' ? 'task' : 'query';
+  const type = record['type'] === 'task' ? 'task' : 'query';
   const allowed = ['Not Started', 'In Progress', 'Waiting', 'Completed'];
-  return { ...record, type, status: type === 'task' ? allowed.includes(String(record.status)) ? record.status : 'Not Started' : undefined, notes: type === 'task' && typeof record.notes === 'string' ? record.notes : undefined };
+  return { ...record, type, status: type === 'task' ? allowed.includes(String(record['status'])) ? record['status'] : 'Not Started' : undefined, notes: type === 'task' && typeof record['notes'] === 'string' ? record['notes'] : undefined };
 }
 export function loadTasks(storage: TaskStorage): Task[] {
   const raw = storage.getItem(TASK_STORAGE_KEY);

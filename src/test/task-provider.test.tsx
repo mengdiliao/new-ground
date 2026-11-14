@@ -18,11 +18,11 @@ function Consumer() {
 
 it('keeps consumers connected to task state when the provider rerenders', () => {
   const view = render(<ProfileProvider><NewGroundProvider><Consumer /></NewGroundProvider></ProfileProvider>);
-  expect(screen.getByLabelText('Task count')).toHaveTextContent('3');
+  expect(screen.getByLabelText('Task count')).toHaveTextContent('0');
   fireEvent.click(screen.getByText('Add task'));
-  expect(screen.getByLabelText('Task count')).toHaveTextContent('4');
+  expect(screen.getByLabelText('Task count')).toHaveTextContent('1');
   view.rerender(<ProfileProvider><NewGroundProvider><Consumer /></NewGroundProvider></ProfileProvider>);
-  expect(screen.getByLabelText('Task count')).toHaveTextContent('4');
+  expect(screen.getByLabelText('Task count')).toHaveTextContent('1');
 });
 function MoveConsumer() {
   const { saveMove, activeMove, moves, switchMove, confirmDetail } = useProfile();
@@ -41,4 +41,16 @@ it('saving does not research; new tasks use confirmed context and remain separat
   expect(screen.getByLabelText('All count')).toHaveTextContent('1');
   fireEvent.click(screen.getByText('First move'));
   expect(screen.getByLabelText('Move task count')).toHaveTextContent('1');
+});
+function StatusConsumer() {
+  const { tasks, newTask, updateNotes, setTaskStatus, researchTask } = useNewGround(); const task = tasks[0];
+  return <><output aria-label="Manual status">{task?.status}</output><button onClick={() => newTask('task')}>Explicit task</button><button onClick={() => { if (task) { updateNotes(task.id, 'PRIVATE NOTE'); setTaskStatus(task.id, 'Waiting'); } }}>Save private note</button><button onClick={() => { if (task) void researchTask(task.id, 'Find Oodi hours'); }}>Run research</button></>;
+}
+it('does not send personal notes or change manual progress when research finishes', async () => {
+  render(<ProfileProvider><NewGroundProvider><StatusConsumer /></NewGroundProvider></ProfileProvider>);
+  fireEvent.click(screen.getByText('Explicit task')); fireEvent.click(screen.getByText('Save private note'));
+  await act(async () => { fireEvent.click(screen.getByText('Run research')); });
+  expect(screen.getByLabelText('Manual status')).toHaveTextContent('Waiting');
+  expect(JSON.stringify(request.mock.calls)).not.toContain('PRIVATE NOTE');
+  expect(request.mock.calls[0]?.[0]).toMatchObject({ data: { message: 'Find Oodi hours' } });
 });
