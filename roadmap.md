@@ -36,4 +36,4 @@
 - [x] Build a flight-booking-style LocationPicker (search + country browsing) on the global GeoNames dataset.
 - [x] Add an onboarding flow and profile model where every value stays unknown until the user sets it.
 - [x] Add a profile-driven dashboard card with empty states and destination-gated move research.
-- [ ] Verify onboarding, swap, empty states, persistence, and existing chat end to end.
+- [x] Verify onboarding, swap, empty states, persistence, and existing chat end to end (67 tests; live answer with sources).
