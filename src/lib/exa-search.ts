@@ -5,12 +5,27 @@ export type SearchOutcome = { ok: true; sources: SearchSource[] } | { ok: false;
 export const searchInput = z.object({ query: z.string().trim().min(1).max(2000) });
 export function exaRequest(query: string) { return { query, type: 'auto', numResults: 5, contents: { highlights: true } }; }
 const responseSchema = z.object({ results: z.array(z.object({ title: z.string().nullish(), url: z.string(), highlights: z.array(z.string()).nullish(), publishedDate: z.string().nullish() })) });
+const HIGHLIGHT_LIMIT = 280;
+export function cleanHighlight(text: string): string {
+  const plain = text
+    .replace(/\[([^\]]*)\]\((?:[^)\s]|\s)*\)/g, '$1')
+    .replace(/^\s{0,3}#{1,6}\s+/gm, '')
+    .replace(/^\s*[-*+]\s+/gm, '')
+    .replace(/^\s*>\s?/gm, '')
+    .replace(/(\*\*|__)(.*?)\1/g, '$2')
+    .replace(/(\*|_)(.*?)\1/g, '$2')
+    .replace(/`([^`]*)`/g, '$1')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return plain.length > HIGHLIGHT_LIMIT ? `${plain.slice(0, HIGHLIGHT_LIMIT).trimEnd()}…` : plain;
+}
 export function normalizeExaResponse(input: unknown): SearchSource[] {
   const response = responseSchema.parse(input);
   return response.results.flatMap(result => {
     let url: URL; try { url = new URL(result.url); } catch { return []; }
     if (!['https:', 'http:'].includes(url.protocol)) return [];
-    const highlights = result.highlights ?? [];
+    const highlights = (result.highlights ?? []).map(cleanHighlight).filter(Boolean);
     return [{ title: result.title?.trim() || url.hostname, url: url.href, domain: url.hostname.replace(/^www\./, ''), highlights, preview: highlights.join('\n\n'), publishedDate: result.publishedDate && Number.isFinite(Date.parse(result.publishedDate)) ? result.publishedDate : null }];
   }).slice(0, 5);
 }
