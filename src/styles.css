@@ -93,6 +93,8 @@
 }
 
 :root {
+  --plant-wood: oklch(0.51 0.055 62);
+  --plant-soil: oklch(0.90 0.026 70);
   --radius: 1.25rem;
   --background: oklch(0.977060 0.007366 80.7212);
   --foreground: oklch(0.349056 0.022368 240.6994);
@@ -151,6 +153,8 @@
 }
 
 .dark {
+  --plant-wood: oklch(0.73 0.055 62);
+  --plant-soil: oklch(0.29 0.026 70);
   --waiting: oklch(0.30 0.04 86);
   --waiting-foreground: oklch(0.85 0.10 86);
   --background: oklch(0.129 0.042 264.695);
@@ -373,3 +377,30 @@ svg { stroke-linecap: round; stroke-linejoin: round; }
 @media (max-width: 767px) { .essential-list { grid-template-columns: 1fr; } .essential-hub .feature-illustration { width: 76px; height: 92px; } }
 
 @media (min-width: 768px) and (max-width: 1100px) { .task-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* The sidebar plant is independent of all assistant and task activity. */
+.ground-illustration { display: block; width: 100%; height: 126px; margin: 5px auto; }
+.ground-soil { fill: var(--plant-soil); }
+.ground-surface, .ground-roots, .ground-trunk, .ground-branch { stroke: var(--plant-wood); }
+.ground-leaf, .ground-canopy { fill: var(--brand-sage); }
+.ground-canopy-light { fill: var(--brand-mint); }
+.ground-plant, .ground-roots { transform-origin: 90px 81px; transition: transform 700ms ease; }
+.ground-plant { transform: scale(0.30); }
+.ground-roots { transform: scale(0.24, 0.20); }
+.ground-second, .ground-more, .ground-later { opacity: 0; transition: opacity 700ms ease; }
+.ground-widget[data-stage="1"] .ground-plant { transform: scale(0.45); }
+.ground-widget[data-stage="1"] .ground-roots { transform: scale(0.40, 0.38); }
+.ground-widget[data-stage="2"] .ground-plant { transform: scale(0.65); }
+.ground-widget[data-stage="2"] .ground-roots { transform: scale(0.60, 0.60); }
+.ground-widget[data-stage="3"] .ground-plant { transform: scale(0.78); }
+.ground-widget[data-stage="3"] .ground-roots { transform: scale(0.80, 0.80); }
+.ground-widget[data-stage="4"] .ground-plant, .ground-widget[data-stage="4"] .ground-roots { transform: scale(1); }
+.ground-widget:not([data-stage="0"]) .ground-second,
+.ground-widget:is([data-stage="2"], [data-stage="3"], [data-stage="4"]) .ground-more,
+.ground-widget:is([data-stage="3"], [data-stage="4"]) .ground-later { opacity: 1; }
+.ground-water { fill: var(--brand-blue); pointer-events: none; }
+.ground-water path { animation: ground-water-fall 700ms ease-in both; }
+.ground-water path:nth-child(2) { animation-delay: 90ms; }
+.ground-water path:nth-child(3) { animation-delay: 160ms; }
+@keyframes ground-water-fall { 0% { opacity: 0; transform: translateY(-4px); } 15% { opacity: 0.8; } 100% { opacity: 0; transform: translateY(56px); } }
+@media (prefers-reduced-motion: reduce) { .ground-water { display: none; } }
