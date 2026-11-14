@@ -32,7 +32,6 @@ export function GrowYourGround() {
   }
 
   return <section aria-label="Grow Your Ground" className="ground-widget mb-6 border-t border-border px-3 pt-4" data-stage={stage}>
-    <h2 className="text-sm font-medium">Grow Your Ground</h2>
     <svg className="ground-illustration" viewBox="0 0 180 142" role="img" aria-label={`Plant growth stage ${stage} of 4`}>
       <path className="ground-soil" d="M22 83 Q90 78 158 83 L151 130 Q90 137 29 130 Z" />
       <g className="ground-roots" fill="none" strokeWidth="2">
