@@ -32,3 +32,4 @@ use the editor.
 ## Application architecture
 - Keep shared navigation and session-only task state in a root-mounted application provider and shell; leaf routes own their page content and metadata.
 - Keep the first-stage assistant frontend-only, with explicit demo results and no external requests for task processing.
+- Store each workspace's conversation, draft, stage, sources, and results on its task record; pure workflow helpers and prop-driven panels keep future data integration independent of presentation.
