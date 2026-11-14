@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as FeaturesFeatureIdRouteImport } from './routes/features.$featureId'
 import { Route as TasksTaskIdRouteImport } from './routes/tasks_.$taskId'
 import { Route as TopicsTopicIdRouteImport } from './routes/topics.$topicId'
 
@@ -36,6 +37,11 @@ const TasksRoute = TasksRouteImport.update({
   path: '/tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeaturesFeatureIdRoute = FeaturesFeatureIdRouteImport.update({
+  id: '/features/$featureId',
+  path: '/features/$featureId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TasksTaskIdRoute = TasksTaskIdRouteImport.update({
   id: '/tasks_/$taskId',
   path: '/tasks/$taskId',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/settings': typeof SettingsRoute
   '/tasks': typeof TasksRoute
+  '/features/$featureId': typeof FeaturesFeatureIdRoute
   '/tasks/$taskId': typeof TasksTaskIdRoute
   '/topics/$topicId': typeof TopicsTopicIdRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/settings': typeof SettingsRoute
   '/tasks': typeof TasksRoute
+  '/features/$featureId': typeof FeaturesFeatureIdRoute
   '/tasks/$taskId': typeof TasksTaskIdRoute
   '/topics/$topicId': typeof TopicsTopicIdRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/settings': typeof SettingsRoute
   '/tasks': typeof TasksRoute
+  '/features/$featureId': typeof FeaturesFeatureIdRoute
   '/tasks_/$taskId': typeof TasksTaskIdRoute
   '/topics/$topicId': typeof TopicsTopicIdRoute
 }
@@ -79,6 +88,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/settings'
     | '/tasks'
+    | '/features/$featureId'
     | '/tasks/$taskId'
     | '/topics/$topicId'
   fileRoutesByTo: FileRoutesByTo
@@ -87,6 +97,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/settings'
     | '/tasks'
+    | '/features/$featureId'
     | '/tasks/$taskId'
     | '/topics/$topicId'
   id:
@@ -95,6 +106,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/settings'
     | '/tasks'
+    | '/features/$featureId'
     | '/tasks_/$taskId'
     | '/topics/$topicId'
   fileRoutesById: FileRoutesById
@@ -104,6 +116,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   SettingsRoute: typeof SettingsRoute
   TasksRoute: typeof TasksRoute
+  FeaturesFeatureIdRoute: typeof FeaturesFeatureIdRoute
   TasksTaskIdRoute: typeof TasksTaskIdRoute
   TopicsTopicIdRoute: typeof TopicsTopicIdRoute
 }
@@ -138,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TasksRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/features/$featureId': {
+      id: '/features/$featureId'
+      path: '/features/$featureId'
+      fullPath: '/features/$featureId'
+      preLoaderRoute: typeof FeaturesFeatureIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tasks_/$taskId': {
       id: '/tasks_/$taskId'
       path: '/tasks/$taskId'
@@ -160,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   SettingsRoute: SettingsRoute,
   TasksRoute: TasksRoute,
+  FeaturesFeatureIdRoute: FeaturesFeatureIdRoute,
   TasksTaskIdRoute: TasksTaskIdRoute,
   TopicsTopicIdRoute: TopicsTopicIdRoute,
 }
