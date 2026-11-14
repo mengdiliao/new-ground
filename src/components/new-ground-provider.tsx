@@ -52,7 +52,7 @@ export function NewGroundProvider({ children }: { children: ReactNode }) {
       const move = moves.find(move => move.id === existing?.moveId);
       const context = move ? moveContext(move) : existing?.moveSnapshot ?? null;
       const messages = existing?.messages ?? [];
-      const emailDraft = messages.findLast(message => message.emailDraft)?.emailDraft ?? null;
+      const emailDraft = [...messages].reverse().find(message => message.emailDraft)?.emailDraft ?? null;
       const prior = messages.at(-1)?.role === 'user' && messages.at(-1)?.text === query ? messages.slice(0, -1) : messages;
       const history = prior.slice(-20).map(message => ({ role: message.role, text: message.text.slice(0, 18000) }));
       for (let index = 0; index <= MAX_AGENT_STEPS + 1; index++) {
