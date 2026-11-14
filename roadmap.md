@@ -20,7 +20,7 @@
 - [x] Verify live search and add a test using an actual Exa response.
 
 ## Intelligent assistant
-- [ ] Add OpenAI Responses orchestration with bounded Exa tools and real progress events.
-- [ ] Preserve per-task conversations, evidence, and research limits across follow-ups.
-- [ ] Connect answers, clarification, retry, and sources without changing the visual system.
-- [ ] Test safety limits and a complete live request.
+- [x] Add OpenAI Responses orchestration with bounded Exa tools and real progress events.
+- [x] Preserve per-task conversations, evidence, and research limits across follow-ups.
+- [x] Connect answers, clarification, retry, and sources without changing the visual system.
+- [x] Test safety limits and a complete live request (33 tests; official Oodi sources, contextual follow-up, desktop and mobile).
